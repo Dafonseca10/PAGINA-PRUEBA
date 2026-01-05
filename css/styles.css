@@ -429,7 +429,7 @@ input:focus, textarea:focus{border-color: rgba(255,255,255,.22)}
 .heroBg{
   position:absolute;
   inset:0;
-  background-image: url("/assets/the-stadium.jpg");
+  background-image: url("assets/the-stadium.jpg");
   background-size: cover;
   background-position: center;
   filter: blur(18px);
@@ -978,4 +978,5 @@ input:focus, textarea:focus{border-color: rgba(255,255,255,.22)}
 .burger.isOpen span:nth-child(3){
   transform: translateY(-8px) rotate(-45deg);
 }
+
 
