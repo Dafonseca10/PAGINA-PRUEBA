@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Catálogo — Ultimate Kits</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="shortcut icon" href="assets/CIRCULAR BLANCO (1).png" type="image/x-icon">
+</head>
+
+<body>
+  <!-- Top notice (tipo LAB46) -->
+  <div class="topbar">
+    <p>Envío gratis · Envios a todo el mundo · Soporte 24/7</p>
+  </div>
+
+  <header class="header">
+  <a class="logo" href="index.html" aria-label="Ultimate Kits">
+  <img class="logoImg"  src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" />
+</a>
+
+
+<button class="burger" id="burgerBtn" type="button"
+  aria-label="Abrir menú" aria-expanded="false">
+  <span></span><span></span><span></span>
+</button>
+
+<nav class="nav" id="navMenu">
+  <a  class="navCta" href="catalogo.html">Catálogo</a>
+  <a href="sobre.html">Sobre</a>
+  <a  href="atencion.html">Atención</a>
+</nav>
+
+<div class="navOverlay" id="navOverlay" hidden></div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+      <div class="pageHead">
+        <h1>Catálogo</h1>
+        <p class="lead">Elige la camiseta que quieras, nosotros hacemos el resto</p>
+      </div>
+
+      <!-- Buscador + limpiar -->
+      <div class="catalogTools">
+        <input id="q" class="catalogSearchInput" type="search"
+          placeholder="Buscar: Athletic, Local 24/25, Visitante..." autocomplete="off">
+        <button class="btn btnGhost" id="clearBtn" type="button">Limpiar</button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filterBar">
+        <div class="filterRow">
+          <div class="chips" id="editionChips"></div>
+
+          <div class="selects">
+            <label class="selectWrap">
+              <span class="selectLabel">Liga</span>
+              <select id="liga"></select>
+            </label>
+
+            <label class="selectWrap">
+              <span class="selectLabel">Club</span>
+              <select id="club"></select>
+            </label>
+
+            <label class="selectWrap">
+              <span class="selectLabel">Tipo</span>
+              <select id="tipo"></select>
+            </label>
+
+            <label class="selectWrap">
+              <span class="selectLabel">Temporada</span>
+              <select id="temporada"></select>
+            </label>
+
+            <label class="selectWrap">
+              <span class="selectLabel">Precio</span>
+              <select id="precio"></select>
+            </label>
+          </div>
+        </div>
+
+        <div class="activeFilters" id="activeFilters"></div>
+      </div>
+
+      <!-- Grid -->
+      <section class="productsGrid" id="grid"></section>
+      <p class="muted" id="empty" hidden>No hay resultados con esos filtros.</p>
+<!-- =========================
+     CARRITO (flotante)
+========================== -->
+<div id="cartBar" style="position:sticky;bottom:0;z-index:20;margin-top:14px;display:none;">
+  <div style="background:#0f0f10;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <div>
+      <strong>Carrito</strong>
+      <span class="muted" id="cartCount" style="margin-left:8px;">0 items</span>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <button id="cartOpenBtn" class="btn btnGhost" type="button">Ver carrito</button>
+      <button id="cartSendBtn" class="btn" type="button">Enviar por WhatsApp</button>
+    </div>
+  </div>
+</div>
+      <!-- Cargar más -->
+      <div class="loadMoreWrap" style="display:flex;justify-content:center;margin:22px 0 6px;">
+        <button id="loadMoreBtn" class="btn btnGhost" type="button">Cargar más</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footerGrid">
+      <div><strong>Ultimate Kits</strong>
+        <p class="muted">Camisetas & moda de fútbol y F1.</p>
+      </div>
+      <div class="footerLinks">
+        <a href="index.html">Inicio</a>
+        <a href="atencion.html">Atención</a>
+        <a href="sobre.html">Sobre</a>
+      </div>
+      <div class="muted">©️ <span id="year"></span> Ultimate Kits</div>
+    </div>
+  </footer>
+
+  <!-- =========================
+       MODAL PEDIDO (WhatsApp)
+  ========================== -->
+  <div class="modal" id="orderModal" hidden>
+    <div class="modalCard">
+      <div class="modalHead">
+        <strong>Pedido</strong>
+        <button class="iconBtn" id="closeModal" type="button" aria-label="Cerrar">✕</button>
+      </div>
+
+      <p class="muted" id="productSummary" style="margin:6px 0 12px;"></p>
+
+      <form id="orderForm" class="form">
+        <label class="field">
+          <span>Nombre en la camiseta</span>
+          <input id="shirtName" type="text" placeholder="Ej: RONALDO" maxlength="16">
+        </label>
+
+        <label class="field">
+          <span>Número</span>
+          <input id="shirtNumber" type="text" placeholder="Ej: 7" maxlength="3">
+        </label>
+
+        <label class="field">
+          <span>Talla</span>
+          <select id="shirtSize">
+            <option value="">Selecciona talla</option>
+            <option>XS</option>
+            <option>S</option>
+            <option>M</option>
+            <option>L</option>
+            <option>XL</option>
+            <option>2XL</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Parches (opcional)</span>
+          <input id="patches" type="text" placeholder="Ej: Champions, LaLiga, UCL...">
+        </label>
+
+        <label class="field">
+          <span>Notas (opcional)</span>
+          <textarea id="notes" rows="3" placeholder="Ej: versión player / manga larga / etc."></textarea>
+        </label>
+
+        <div class="formActions" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+          <button class="btn btnGhost" type="button" id="cancelOrder">Cancelar</button>
+          <button class="btn" type="submit">Enviar a WhatsApp</button>
+        </div>
+
+        <p class="muted" style="margin-top:10px;font-size:.9rem;">
+          Se abrirá WhatsApp con el mensaje ya preparado.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================
+     MODAL CARRITO
+========================== -->
+<div class="modal" id="cartModal" hidden>
+  <div class="modalCard" style="max-width:760px;">
+    <div class="modalHead">
+      <strong>Tu carrito</strong>
+      <button class="iconBtn" id="closeCart" type="button" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div id="cartList" style="display:grid;gap:10px;margin-top:10px;"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+      <div class="muted" id="cartTotal"></div>
+      <div style="display:flex; gap:10px;">
+        <button id="cartClearBtn" class="btn btnGhost" type="button">Vaciar</button>
+        <button id="cartSendBtn2" class="btn" type="button">Enviar por WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script src="js/main.js"></script>
+  <script>
+    
+
+
+    // ==============================
+    // CONFIG
+    // ==============================
+    const API_URL = "https://script.google.com/macros/s/AKfycbz6TTfMHe48eV4lJMzJK8xynyZ-JxVTbAwV5eyyhj-AuyaPRh-xKHnuhGS-AS5xSat6tQ/exec";
+    const WHATSAPP_NUMBER = "34648972815";
+
+    // ==============================
+    // JSONP (evita CORS)
+    // ==============================
+    function loadJSONP(url) {
+      return new Promise((resolve, reject) => {
+        const cbName = "cb_" + Math.random().toString(36).slice(2);
+        window[cbName] = (data) => { resolve(data); cleanup(); };
+
+        const s = document.createElement("script");
+        s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cbName + "&_=" + Date.now();
+        s.onerror = () => { reject(new Error("JSONP load error")); cleanup(); };
+        document.body.appendChild(s);
+
+        function cleanup() {
+          try { delete window[cbName]; } catch (e) {}
+          if (s.parentNode) s.parentNode.removeChild(s);
+        }
+      });
+    }
+
+    // ==============================
+    // Estado + DOM
+    // ==============================
+    const state = {
+      edicion: "all",
+      liga: "all",
+      club: "all",
+      tipo: "all",
+      temporada: "all",
+      precio: "all",
+      q: ""
+    };
+
+    const grid = document.getElementById("grid");
+    const emptyEl = document.getElementById("empty");
+    const editionChips = document.getElementById("editionChips");
+
+    const ligaSel = document.getElementById("liga");
+    const clubSel = document.getElementById("club");
+    const tipoSel = document.getElementById("tipo");
+    const temporadaSel = document.getElementById("temporada");
+    const precioSel = document.getElementById("precio");
+
+    const q = document.getElementById("q");
+    const clearBtn = document.getElementById("clearBtn");
+    const activeFiltersEl = document.getElementById("activeFilters");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+    // Modal
+    const modal = document.getElementById("orderModal");
+    const closeModalBtn = document.getElementById("closeModal");
+    const cancelOrderBtn = document.getElementById("cancelOrder");
+    const productSummary = document.getElementById("productSummary");
+    const orderForm = document.getElementById("orderForm");
+
+    let selectedProduct = null;
+
+    // ==============================
+    // Helpers UI
+    // ==============================
+    function norm(s) { return (s || "").toString().toLowerCase().trim(); }
+    function unique(arr) { return [...new Set(arr.filter(Boolean))].sort((a,b)=> a.localeCompare(b, "es")); }
+
+    function setOptions(select, values, placeholder = "Todos") {
+      select.innerHTML = "";
+      const opt0 = document.createElement("option");
+      opt0.value = "all";
+      opt0.textContent = placeholder;
+      select.appendChild(opt0);
+
+      values.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        select.appendChild(o);
+      });
+    }
+
+    function priceLabel(p) {
+      if (p === 25) return "25€ (Fan)";
+      if (p === 30) return "30€ (Edición especial)";
+      if (p === 35) return "35€ (Retro/Player)";
+      return `${p}€`;
+    }
+
+    function renderEditionChips() {
+      const base = ["Fan", "Player", "Retro", "Edición especial"];
+      const all = ["all", ...base];
+
+      editionChips.innerHTML = all.map(v => {
+        const label = v === "all" ? "Todo" : v;
+        const on = (state.edicion === v);
+        return `<button class="chip ${on ? "isOn" : ""}" data-ed="${v}">${label}</button>`;
+      }).join("");
+
+      editionChips.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.edicion = btn.dataset.ed;
+          renderEditionChips();
+          fetchPage(true);
+        });
+      });
+    }
+
+    function renderActive() {
+      const parts = [];
+      if (state.edicion !== "all") parts.push(`Edición: ${state.edicion}`);
+      if (state.liga !== "all") parts.push(`Liga: ${state.liga}`);
+      if (state.club !== "all") parts.push(`Club: ${state.club}`);
+      if (state.tipo !== "all") parts.push(`Tipo: ${state.tipo}`);
+      if (state.temporada !== "all") parts.push(`Temporada: ${state.temporada}`);
+      if (state.precio !== "all") parts.push(`Precio: ${state.precio}€`);
+      if (state.q) parts.push(`Buscar: “${state.q}”`);
+
+      activeFiltersEl.innerHTML = parts.length
+        ? `<span class="afLabel">Filtros:</span> ${parts.map(p => `<span class="afPill">${p}</span>`).join("")}`
+        : `<span class="afLabel muted">Sin filtros activos</span>`;
+    }
+
+    function cardHTML(it) {
+      return `
+        <article class="productCard">
+          <div class="productImg">
+            <img src="${it.img}" alt="${it.nombre}" loading="lazy" />
+            <span class="pFloat">${it.edicion}</span>
+          </div>
+          <div class="productInfo">
+            <h3>${it.nombre}</h3>
+            <p class="muted">${it.club || ""}${it.temporada ? " · " + it.temporada : ""}${it.tipo ? " · " + it.tipo : ""}</p>
+           <div class="productBottom">
+  <span class="price">${(it.precio ?? "").toString()}€</span>
+
+  <div style="display:flex; gap:10px;">
+    <a class="miniBtn js-order" href="#" data-id="${it.id}">Pedir</a>
+    <a class="miniBtn js-add" href="#" data-id="${it.id}">Añadir</a>
+  </div>
+</div>
+          </div>
+        </article>
+      `;
+    }
+
+    // ==============================
+    // PAGINACIÓN REAL (60 + Cargar más)
+    // ==============================
+    let items = [];
+    let page = 1;
+    const limit = 60;
+    let total = 0;
+    let loading = false;
+
+    async function fetchPage(reset = false) {
+      if (loading) return;
+      loading = true;
+
+      if (reset) {
+        page = 1;
+        items = [];
+        grid.innerHTML = "";
+      }
+
+      // params
+      const params = new URLSearchParams();
+      params.set("page", String(page));
+      params.set("limit", String(limit));
+
+      params.set("q", state.q || "");
+      params.set("liga", state.liga);
+      params.set("club", state.club);
+      params.set("edicion", state.edicion);
+      params.set("tipo", state.tipo);
+      params.set("temporada", state.temporada);
+      params.set("precio", state.precio);
+
+      try {
+        const data = await loadJSONP(API_URL + "?" + params.toString());
+
+        total = Number(data.total || 0);
+        const newItems = data.items || [];
+        items = items.concat(newItems);
+
+        // render (append)
+        grid.innerHTML = items.map(cardHTML).join("");
+
+        emptyEl.hidden = total !== 0;
+        renderActive();
+
+        // botón cargar más
+        loadMoreBtn.hidden = items.length >= total || total === 0;
+
+        page += 1;
+      } catch (err) {
+        console.error(err);
+        grid.innerHTML = `<p class="muted">No se pudo cargar el catálogo. Revisa tu API (Apps Script).</p>`;
+      } finally {
+        loading = false;
+      }
+    }
+
+    loadMoreBtn.addEventListener("click", () => fetchPage(false));
+
+    // ==============================
+    // Modal WhatsApp
+    // ==============================
+   // ==============================
+// Carrito + Modal pedido + WhatsApp
+// ==============================
+const cartBar = document.getElementById("cartBar");
+const cartCountEl = document.getElementById("cartCount");
+const cartOpenBtn = document.getElementById("cartOpenBtn");
+const cartSendBtn = document.getElementById("cartSendBtn");
+
+const cartModal = document.getElementById("cartModal");
+const closeCartBtn = document.getElementById("closeCart");
+const cartList = document.getElementById("cartList");
+const cartTotalEl = document.getElementById("cartTotal");
+const cartClearBtn = document.getElementById("cartClearBtn");
+const cartSendBtn2 = document.getElementById("cartSendBtn2");
+
+// Persistencia simple (para que no se pierda)
+const CART_KEY = "uk_cart_v1";
+let cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+
+function saveCart(){
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  updateCartBar();
+}
+
+function updateCartBar(){
+  if(!cartBar) return;
+  const n = cart.length;
+  cartBar.style.display = n ? "block" : "none";
+  cartCountEl.textContent = `${n} item${n === 1 ? "" : "s"}`;
+}
+
+function money(n){ return `${Number(n||0)}€`; }
+
+function cartItemHTML(item, idx){
+  return `
+    <div style="display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px;">
+      <img src="${item.img}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:12px;flex:0 0 auto;">
+      <div style="flex:1;">
+        <strong>${item.nombre}</strong>
+        <div class="muted" style="margin-top:4px;">
+          ${[item.liga, item.club, item.temporada, item.tipo, item.edicion].filter(Boolean).join(" · ")}
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+          <label class="field" style="margin:0;">
+            <span>Nombre</span>
+            <input data-cart="name" data-idx="${idx}" type="text" value="${item.customName || ""}" placeholder="Ej: RONALDO" maxlength="16">
+          </label>
+
+          <label class="field" style="margin:0;">
+            <span>Número</span>
+            <input data-cart="number" data-idx="${idx}" type="text" value="${item.customNumber || ""}" placeholder="Ej: 7" maxlength="3">
+          </label>
+
+          <label class="field" style="margin:0;">
+            <span>Talla</span>
+            <select data-cart="size" data-idx="${idx}">
+              <option value="">Selecciona talla</option>
+              ${["XS","S","M","L","XL","2XL"].map(s => `<option ${item.size===s?"selected":""}>${s}</option>`).join("")}
+            </select>
+          </label>
+
+          <label class="field" style="margin:0;">
+            <span>Parches</span>
+            <input data-cart="patches" data-idx="${idx}" type="text" value="${item.patches || ""}" placeholder="Ej: Champions / LaLiga / UCL">
+          </label>
+
+          <label class="field" style="grid-column:1 / -1;margin:0;">
+            <span>Notas</span>
+            <input data-cart="notes" data-idx="${idx}" type="text" value="${item.notes || ""}" placeholder="Ej: manga larga / versión player...">
+          </label>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+          <span class="muted">${money(item.precio)}</span>
+          <button class="btn btnGhost" type="button" data-cart="remove" data-idx="${idx}">Quitar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCart(){
+  if(!cartList) return;
+  cartList.innerHTML = cart.map(cartItemHTML).join("") || `<p class="muted">Tu carrito está vacío.</p>`;
+  const total = cart.reduce((sum, x) => sum + Number(x.precio||0), 0);
+  cartTotalEl.textContent = cart.length ? `Total estimado: ${money(total)}` : "";
+  updateCartBar();
+}
+
+function openCart(){
+  renderCart();
+  cartModal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeCart(){
+  cartModal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+closeCartBtn.addEventListener("click", closeCart);
+cartModal.addEventListener("click", (e)=>{ if(e.target === cartModal) closeCart(); });
+
+cartOpenBtn.addEventListener("click", openCart);
+
+cartClearBtn.addEventListener("click", ()=>{
+  cart = [];
+  saveCart();
+  renderCart();
+});
+
+function sendCartToWhatsApp(){
+  if(!cart.length) return;
+
+  const blocks = cart.map((p, i) => {
+    const lines = [
+      `🧾 Camiseta #${i+1}`,
+      `• Producto: ${p.nombre || ""}`.trim(),
+      p.club ? `• Club: ${p.club}` : null,
+      p.liga ? `• Liga: ${p.liga}` : null,
+      p.temporada ? `• Temporada: ${p.temporada}` : null,
+      p.tipo ? `• Tipo: ${p.tipo}` : null,
+      p.edicion ? `• Edición: ${p.edicion}` : null,
+      p.size ? `• Talla: ${p.size}` : `• Talla: (sin talla)`,
+      p.customName ? `• Nombre: ${p.customName}` : `• Nombre: (sin nombre)`,
+      p.customNumber ? `• Número: ${p.customNumber}` : `• Número: (sin número)`,
+      p.patches ? `• Parches: ${p.patches}` : null,
+      `• Foto: ${p.img}`,
+      `• Precio: ${p.precio}€`,
+      p.notes ? `• Notas: ${p.notes}` : null
+    ].filter(Boolean);
+
+    return lines.join("\n");
+  });
+
+  const header = [
+    "Hola Ultimate Kits 👋",
+    "Quiero hacer este pedido (carrito):",
+    ""
+  ].join("\n");
+
+  const text = encodeURIComponent(header + blocks.join("\n\n" + "—".repeat(12) + "\n\n"));
+  window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+}
+
+cartSendBtn.addEventListener("click", sendCartToWhatsApp);
+cartSendBtn2.addEventListener("click", sendCartToWhatsApp);
+
+// ===== Modal Pedido individual (lo que ya tenías) =====
+function openModal(product) {
+  selectedProduct = product;
+  productSummary.textContent =
+    `${product.edicion} · ${product.club || ""}${product.temporada ? " · " + product.temporada : ""}${product.tipo ? " · " + product.tipo : ""} · ${product.precio}€`;
+  modal.hidden = false;
+  document.body.style.overflow = "hidden";
+  orderForm.reset();
+}
+
+function closeModal() {
+  modal.hidden = true;
+  document.body.style.overflow = "";
+  selectedProduct = null;
+}
+
+closeModalBtn.addEventListener("click", closeModal);
+cancelOrderBtn.addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+// Clicks: Pedir / Añadir
+document.addEventListener("click", (e) => {
+  const orderBtn = e.target.closest("a.js-order");
+  const addBtn = e.target.closest("a.js-add");
+  if (!orderBtn && !addBtn) return;
+
+  e.preventDefault();
+  const btn = orderBtn || addBtn;
+  const id = btn.dataset.id;
+  const product = items.find(x => x.id === id);
+  if (!product) return;
+
+  if (addBtn) {
+    cart.push({
+      ...product,
+      customName: "",
+      customNumber: "",
+      size: "",
+      patches: "",
+      notes: ""
+    });
+    saveCart();
+    updateCartBar();
+    return;
+  }
+
+  // pedir individual
+  openModal(product);
+});
+
+// Submit pedido individual -> WhatsApp
+orderForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!selectedProduct) return;
+
+  const shirtName = document.getElementById("shirtName").value.trim();
+  const shirtNumber = document.getElementById("shirtNumber").value.trim();
+  const shirtSize = document.getElementById("shirtSize").value;
+  const patches = document.getElementById("patches").value.trim();
+  const notes = document.getElementById("notes").value.trim();
+
+  const lines = [
+    "Hola Ultimate Kits 👋",
+    "Quiero pedir:",
+    "",
+    `• Producto: ${selectedProduct.nombre || ""}`.trim(),
+    selectedProduct.club ? `• Club: ${selectedProduct.club}` : null,
+    selectedProduct.liga ? `• Liga: ${selectedProduct.liga}` : null,
+    selectedProduct.temporada ? `• Temporada: ${selectedProduct.temporada}` : null,
+    selectedProduct.tipo ? `• Tipo: ${selectedProduct.tipo}` : null,
+    `• Edición: ${selectedProduct.edicion || ""}`.trim(),
+    shirtSize ? `• Talla: ${shirtSize}` : "• Talla: (sin talla)",
+    shirtName ? `• Nombre camiseta: ${shirtName}` : "• Nombre camiseta: (sin nombre)",
+    shirtNumber ? `• Número: ${shirtNumber}` : "• Número: (sin número)",
+    patches ? `• Parches: ${patches}` : null,
+    `• Foto: ${selectedProduct.img}`,
+    `• Precio: ${selectedProduct.precio}€`,
+    notes ? `• Notas: ${notes}` : null,
+    "",
+    "Gracias!"
+  ].filter(Boolean);
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+  window.location.href = url;
+});
+
+// Inputs dentro del carrito
+document.addEventListener("input", (e)=>{
+  const el = e.target;
+  const key = el.dataset.cart;
+  if(!key) return;
+
+  const idx = Number(el.dataset.idx);
+  if(!Number.isFinite(idx) || !cart[idx]) return;
+
+  if(key === "name") cart[idx].customName = el.value;
+  if(key === "number") cart[idx].customNumber = el.value;
+  if(key === "patches") cart[idx].patches = el.value;
+  if(key === "notes") cart[idx].notes = el.value;
+
+  saveCart();
+});
+
+document.addEventListener("change", (e)=>{
+  const el = e.target;
+  const key = el.dataset.cart;
+  if(key !== "size") return;
+
+  const idx = Number(el.dataset.idx);
+  if(!Number.isFinite(idx) || !cart[idx]) return;
+
+  cart[idx].size = el.value;
+  saveCart();
+});
+
+document.addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-cart='remove']");
+  if(!btn) return;
+  const idx = Number(btn.dataset.idx);
+  if(!Number.isFinite(idx)) return;
+  cart.splice(idx, 1);
+  saveCart();
+  renderCart();
+});
+
+// inicial
+updateCartBar();
+    // submit -> WhatsApp
+    orderForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!selectedProduct) return;
+
+      const shirtName = document.getElementById("shirtName").value.trim();
+      const shirtNumber = document.getElementById("shirtNumber").value.trim();
+      const shirtSize = document.getElementById("shirtSize").value;
+      const patches = document.getElementById("patches").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+
+      const lines = [
+        "Hola Ultimate Kits 👋",
+        "Quiero pedir:",
+        "",
+        `• Producto: ${selectedProduct.nombre || ""}`.trim(),
+        selectedProduct.club ? `• Club: ${selectedProduct.club}` : null,
+        selectedProduct.liga ? `• Liga: ${selectedProduct.liga}` : null,
+        selectedProduct.temporada ? `• Temporada: ${selectedProduct.temporada}` : null,
+        selectedProduct.tipo ? `• Tipo: ${selectedProduct.tipo}` : null,
+        `• Edición: ${selectedProduct.edicion || ""}`.trim(),
+        shirtSize ? `• Talla: ${shirtSize}` : null,
+        shirtName ? `• Nombre camiseta: ${shirtName}` : "• Nombre camiseta: (sin nombre)",
+        shirtNumber ? `• Número: ${shirtNumber}` : "• Número: (sin número)",
+        patches ? `• Parches: ${patches}` : null,
+        `• Foto: ${selectedProduct.img}`,
+        `• Precio: ${selectedProduct.precio}€`,
+        notes ? `• Notas: ${notes}` : null,
+        "",
+        "Gracias!"
+      ].filter(Boolean);
+
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+      window.location.href = url;
+    });
+
+    // ==============================
+    // Init
+    // ==============================
+    function debounce(fn, wait = 250) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), wait);
+      };
+    }
+
+    async function init() {
+      // footer year
+      const y = document.getElementById("year");
+      if (y) y.textContent = new Date().getFullYear();
+
+      // cargar meta (listas para selects)
+      const metaData = await loadJSONP(API_URL + "?mode=meta");
+      const meta = metaData.meta || { ligas:[], clubs:[], tipos:[], temporadas:[], precios:[] };
+
+      renderEditionChips();
+      setOptions(ligaSel, meta.ligas || [], "Todas");
+      setOptions(clubSel, meta.clubs || [], "Todos");
+      setOptions(tipoSel, meta.tipos || [], "Todos");
+      setOptions(temporadaSel, meta.temporadas || [], "Todas");
+
+      precioSel.innerHTML =
+        `<option value="all">Todos</option>` +
+        (meta.precios || []).map(v => `<option value="${v}">${priceLabel(Number(v))}</option>`).join("");
+
+      // listeners filtros
+      ligaSel.addEventListener("change", () => { state.liga = ligaSel.value; fetchPage(true); });
+      clubSel.addEventListener("change", () => { state.club = clubSel.value; fetchPage(true); });
+      tipoSel.addEventListener("change", () => { state.tipo = tipoSel.value; fetchPage(true); });
+      temporadaSel.addEventListener("change", () => { state.temporada = temporadaSel.value; fetchPage(true); });
+      precioSel.addEventListener("change", () => { state.precio = precioSel.value; fetchPage(true); });
+
+      q.addEventListener("input", debounce(() => {
+        state.q = norm(q.value);
+        fetchPage(true);
+      }, 250));
+
+      clearBtn.addEventListener("click", () => {
+        state.edicion = "all";
+        state.liga = "all";
+        state.club = "all";
+        state.tipo = "all";
+        state.temporada = "all";
+        state.precio = "all";
+        state.q = "";
+        q.value = "";
+
+        ligaSel.value = "all";
+        clubSel.value = "all";
+        tipoSel.value = "all";
+        temporadaSel.value = "all";
+        precioSel.value = "all";
+
+        renderEditionChips();
+        fetchPage(true);
+      });
+
+      // primera carga
+      await fetchPage(true);
+    }
+
+    init().catch(err => {
+      console.error(err);
+      grid.innerHTML = `<p class="muted">No se pudo iniciar el catálogo. Revisa tu Apps Script.</p>`;
+    });
+  </script>
+</body>
+</html>
