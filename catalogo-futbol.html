@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Catálogo Fútbol — Ultimate Kits</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="shortcut icon" href="assets/CIRCULAR BLANCO (1).png" type="image/x-icon">
+</head>
+
+<body data-mode="football">
+  <div class="topbar">
+    <p>Envío gratis · Envios a todo el mundo · Soporte 24/7</p>
+  </div>
+
+  <header class="header">
+    <a class="logo" href="index.html" aria-label="Ultimate Kits">
+      <img class="logoImg" src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" />
+    </a>
+
+    <button class="burger" id="burgerBtn" type="button" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+ <nav class="nav" id="navMenu">
+  <a href="catalogo-f1.html"">F1</a>
+  <a href="catalogo-futbol.html">Camisetas</a>
+  <a href="sobre.html">Sobre</a>
+  <a href="atencion.html">Atención</a>
+</nav>
+
+    <div class="navOverlay" id="navOverlay" hidden></div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+      <div class="pageHead">
+        <h1>Catálogo</h1>
+        <p class="lead">Elige la camiseta que quieras, nosotros hacemos el resto</p>
+      </div>
+
+      <!-- Buscador + limpiar -->
+      <div class="catalogTools">
+        <input id="q" class="catalogSearchInput" type="search"
+               placeholder="Buscar: Athletic, Local 24/25, Visitante..."
+               autocomplete="off">
+        <button class="btn btnGhost" id="clearBtn" type="button">Limpiar</button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filterBar">
+        <div class="filterRow">
+
+          <!-- Tabs (separación real por páginas) -->
+          <div class="chips">
+            <a class="chip isOn" href="catalogo-futbol.html">Fútbol</a>
+            <a class="chip" href="catalogo-f1.html">F1</a>
+          </div>
+
+          <!-- Ediciones (solo fútbol) -->
+          <div class="chips" id="editionChips"></div>
+
+          <!-- Selects -->
+          <div class="selects">
+            <label class="selectWrap">
+              <span class="selectLabel">Club</span>
+              <select id="club"></select>
+            </label>
+
+            <label class="selectWrap">
+              <span class="selectLabel">Tipo</span>
+              <select id="tipo"></select>
+            </label>
+
+            <label class="selectWrap">
+              <span class="selectLabel">Precio</span>
+              <select id="precio"></select>
+            </label>
+          </div>
+        </div>
+
+        <div class="activeFilters" id="activeFilters"></div>
+      </div>
+
+      <!-- Grid -->
+      <section class="productsGrid" id="grid"></section>
+      <p class="muted" id="empty" hidden>No hay resultados con esos filtros.</p>
+
+      <!-- Carrito flotante -->
+      <div id="cartBar" style="position:sticky;bottom:0;z-index:20;margin-top:14px;display:none;">
+        <div style="background:#0f0f10;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div>
+            <strong>Carrito</strong>
+            <span class="muted" id="cartCount" style="margin-left:8px;">0 items</span>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button id="cartOpenBtn" class="btn btnGhost" type="button">Ver carrito</button>
+            <button id="cartSendBtn" class="btn" type="button">Enviar por WhatsApp</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cargar más -->
+      <div class="loadMoreWrap" style="display:flex;justify-content:center;margin:22px 0 6px;">
+        <button id="loadMoreBtn" class="btn btnGhost" type="button">Cargar más</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footerGrid">
+      <div>
+        <strong>Ultimate Kits</strong>
+        <p class="muted">Camisetas & moda de fútbol y F1.</p>
+      </div>
+
+      <div class="footerLinks">
+        <a href="catalogo.html">Catálogo</a>
+        <a href="catalogo-futbol.html">F1</a>
+        <a href="atencion.html">Atención</a>
+        <a href="sobre.html">Sobre</a>
+      </div>
+
+      <div class="muted">
+        © <span id="year"></span> Ultimate Kits
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL PEDIDO -->
+  <div class="modal" id="orderModal" hidden>
+    <div class="modalCard">
+      <div class="modalHead" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.10);">
+        <strong>Pedido</strong>
+        <button class="iconBtn" id="closeModal" type="button" aria-label="Cerrar"
+                style="width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:20px;">✕</button>
+      </div>
+
+      <div style="padding:14px 16px;">
+        <p class="muted" id="productSummary" style="margin:6px 0 12px;"></p>
+
+        <form id="orderForm" class="form">
+          <label class="field">
+            <span>Nombre en la camiseta</span>
+            <input id="shirtName" type="text" placeholder="Ej: RONALDO" maxlength="16">
+          </label>
+
+          <label class="field">
+            <span>Número</span>
+            <input id="shirtNumber" type="text" placeholder="Ej: 7" maxlength="3">
+          </label>
+
+          <label class="field">
+            <span>Talla</span>
+            <select id="shirtSize">
+              <option value="">Selecciona talla</option>
+              <option>XS</option><option>S</option><option>M</option><option>L</option>
+              <option>XL</option><option>2XL</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Parches (opcional)</span>
+            <input id="patches" type="text" placeholder="Ej: Champions, LaLiga, UCL...">
+          </label>
+
+          <label class="field">
+            <span>Notas (opcional)</span>
+            <textarea id="notes" rows="3" placeholder="Ej: versión player / manga larga / etc."></textarea>
+          </label>
+
+          <div class="formActions" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+            <button class="btn btnGhost" type="button" id="cancelOrder">Cancelar</button>
+            <button class="btn" type="submit">Enviar a WhatsApp</button>
+          </div>
+
+          <p class="muted" style="margin-top:10px;font-size:.9rem;">
+            Se abrirá WhatsApp con el mensaje ya preparado.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CARRITO -->
+  <div class="modal" id="cartModal" hidden>
+    <div class="modalCard" style="max-width:760px;">
+      <div class="modalHead" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.10);">
+        <strong>Tu carrito</strong>
+        <button class="iconBtn" id="closeCart" type="button" aria-label="Cerrar"
+                style="width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:20px;">✕</button>
+      </div>
+
+      <div style="padding:14px 16px;">
+        <div id="cartList" style="display:grid;gap:10px;margin-top:10px;"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+          <div class="muted" id="cartTotal"></div>
+          <div style="display:flex; gap:10px;">
+            <button id="cartClearBtn" class="btn btnGhost" type="button">Vaciar</button>
+            <button id="cartSendBtn2" class="btn" type="button">Enviar por WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/catalogo.js"></script>
+</body>
+</html>
+
