@@ -1,39 +1,61 @@
 // ==============================
+// ULTIMATE KITS — CATALOGO + CARRITO + WHATSAPP
+// - Catálogo: JSONP desde Apps Script (meta + paginación)
+// - Pedido individual: modal "orderModal" -> WhatsApp
+// - Carrito: abre modal "checkoutModal" (datos envío) -> WhatsApp con OrderID
+// ==============================
+
+// ==============================
 // CONFIG
 // ==============================
 const API_URL = "https://script.google.com/macros/s/AKfycbxQ1fCIQRCBZh94mRx3tW6-L1ABz2TxBE8YOUGpDQPDoGvAQdksizP-vXAUTtIbRVVMFA/exec";
 const WHATSAPP_NUMBER = "584246392010";
-function money(n){ return `$${Number(n || 0)}`; }
+const DEFAULT_LIMIT = 60;
+const CART_KEY = "uk_cart_v2";
+
+function money(n) {
+  const num = Number(n || 0);
+  return `$${num}`;
+}
 
 // ==============================
-// JSONP
+// JSONP helper
 // ==============================
-function loadJSONP(url){
+function loadJSONP(url) {
   return new Promise((resolve, reject) => {
     const cbName = "cb_" + Math.random().toString(36).slice(2);
-    window[cbName] = (data) => { resolve(data); cleanup(); };
-
     const s = document.createElement("script");
+
+    window[cbName] = (data) => {
+      resolve(data);
+      cleanup();
+    };
+
     s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cbName + "&_=" + Date.now();
-    s.onerror = () => { reject(new Error("JSONP load error")); cleanup(); };
+    s.onerror = () => {
+      reject(new Error("JSONP load error"));
+      cleanup();
+    };
+
     document.body.appendChild(s);
 
-    function cleanup(){
-      try { delete window[cbName]; } catch(e) {}
-      if (s.parentNode) s.parentNode.removeChild(s);
+    function cleanup() {
+      try { delete window[cbName]; } catch (e) {}
+      if (s && s.parentNode) s.parentNode.removeChild(s);
     }
   });
 }
 
 // ==============================
-// Helpers
+// Utils
 // ==============================
-function norm(s){ return (s || "").toString().toLowerCase().trim(); }
-function unique(arr){ return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es")); }
+function norm(s) { return (s || "").toString().toLowerCase().trim(); }
+function unique(arr) { return [...new Set((arr || []).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es")); }
 
-function setOptions(select, values, placeholder="Todos"){
-  if(!select) return;
+function setOptions(select, values, placeholder="Todos") {
+  if (!select) return;
   select.innerHTML = "";
+
   const opt0 = document.createElement("option");
   opt0.value = "all";
   opt0.textContent = placeholder;
@@ -47,24 +69,123 @@ function setOptions(select, values, placeholder="Todos"){
   });
 }
 
-function priceLabelUSD(p){
-  if (p === 25) return "$25 (Fan)";
-  if (p === 30) return "$30 (Edición especial)";
-  if (p === 35) return "$35 (Retro/Player)";
-  if (p === 40) return "$40 (Chaquetas F1)";
-  return money(p);
+function priceLabelUSD(p) {
+  const n = Number(p);
+  if (n === 25) return "$25 (Fan)";
+  if (n === 30) return "$30 (Edición especial)";
+  if (n === 35) return "$35 (Retro/Player)";
+  if (n === 40) return "$40 (Chaquetas F1)";
+  return money(n);
 }
 
-function cardHTML(it){
+function makeOrderId() {
+  // UK-<year><month><day>-<random>-<time36>
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  return "UK-" + ymd + "-" + Math.random().toString(36).slice(2, 7).toUpperCase() + "-" + Date.now().toString(36).toUpperCase();
+}
+
+// ==============================
+// DOM
+// ==============================
+const MODE = (document.body.getAttribute("data-mode") || "football").toLowerCase(); // "football" | "f1"
+
+const grid = document.getElementById("grid");
+const emptyEl = document.getElementById("empty");
+const activeFiltersEl = document.getElementById("activeFilters");
+const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+const qEl = document.getElementById("q");
+const clearBtn = document.getElementById("clearBtn");
+
+const editionChips = document.getElementById("editionChips"); // fútbol
+const f1TeamsEl = document.getElementById("f1Teams");         // f1 (si existiera)
+
+const clubSel = document.getElementById("club");
+const tipoSel = document.getElementById("tipo");
+const precioSel = document.getElementById("precio");
+
+// Modal pedido individual (ya existe en tu HTML)
+const orderModal = document.getElementById("orderModal");
+const closeModalBtn = document.getElementById("closeModal");
+const cancelOrderBtn = document.getElementById("cancelOrder");
+const productSummary = document.getElementById("productSummary");
+const orderForm = document.getElementById("orderForm");
+
+// Carrito + modal carrito (ya existe en tu HTML)
+const cartBar = document.getElementById("cartBar");
+const cartCountEl = document.getElementById("cartCount");
+const cartOpenBtn = document.getElementById("cartOpenBtn");
+const cartSendBtn = document.getElementById("cartSendBtn");
+
+const cartModal = document.getElementById("cartModal");
+const closeCartBtn = document.getElementById("closeCart");
+const cartList = document.getElementById("cartList");
+const cartTotalEl = document.getElementById("cartTotal");
+const cartClearBtn = document.getElementById("cartClearBtn");
+const cartSendBtn2 = document.getElementById("cartSendBtn2");
+
+// Checkout modal (datos envío) -> lo vamos a usar con .modal/.modalCard
+const checkoutModal = document.getElementById("checkoutModal");
+const checkoutForm = document.getElementById("checkoutForm");
+
+// ==============================
+// Estado catálogo
+// ==============================
+const state = {
+  mode: MODE,
+  f1Team: "all",
+  edicion: "all",
+  club: "all",
+  tipo: "all",
+  precio: "all",
+  q: ""
+};
+
+let allItems = [];
+let page = 1;
+let total = 0;
+let loading = false;
+
+// ==============================
+// UI: filtros activos
+// ==============================
+function renderActive() {
+  if (!activeFiltersEl) return;
+
+  const parts = [];
+  parts.push(state.mode === "f1" ? "Modo: F1" : "Modo: Fútbol");
+
+  if (state.mode === "f1") {
+    if (state.f1Team !== "all") parts.push(`Escudería: ${state.f1Team}`);
+  } else {
+    if (state.edicion !== "all") parts.push(`Edición: ${state.edicion}`);
+    if (state.club !== "all") parts.push(`Club: ${state.club}`);
+  }
+
+  if (state.tipo !== "all") parts.push(`Tipo: ${state.tipo}`);
+  if (state.precio !== "all") parts.push(`Precio: ${money(state.precio)}`);
+  if (state.q) parts.push(`Buscar: “${state.q}”`);
+
+  activeFiltersEl.innerHTML = parts.length
+    ? `<span class="afLabel">Filtros:</span> ${parts.map(p => `<span class="afPill">${p}</span>`).join("")}`
+    : `<span class="afLabel muted">Sin filtros activos</span>`;
+}
+
+// ==============================
+// HTML Card
+// ==============================
+function cardHTML(it) {
   const metaLine = [it.club || "", it.tipo || ""].filter(Boolean).join(" · ");
+
   return `
     <article class="productCard">
       <div class="productImg">
-        <img src="${it.img}" alt="${it.nombre}" loading="lazy" />
+        <img src="${it.img}" alt="${it.nombre || "Producto"}" loading="lazy" />
         <span class="pFloat">${it.edicion || ""}</span>
       </div>
       <div class="productInfo">
-        <h3>${it.nombre}</h3>
+        <h3>${it.nombre || "Producto"}</h3>
         <p class="muted">${metaLine}</p>
 
         <div class="productBottom">
@@ -79,164 +200,31 @@ function cardHTML(it){
   `;
 }
 
-const ORDERS_WEBAPP_URL = "7ef6f4db-a669-48fe-a830-692804c6f509";
-
-function makeOrderId(){
-  return "UK-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,7);
-}
-
-async function saveOrderToAppSheetFromWeb(cart){
-  const orderId = makeOrderId();
-  const total = cart.reduce((s, p) => s + Number(p.precio || 0), 0);
-
-  const payload = {
-    orderId,
-    customerId: "WEB",
-    customerName: "CLIENTE WEB",
-    status: "DRAFT",
-    total,
-    shipping: {
-      destinoFinal: "SI",
-      country: "PENDIENTE",
-      state: "PENDIENTE",
-      city: "PENDIENTE",
-      address: "PENDIENTE",
-      postal: "00000"
-    },
-    notes: `Pedido creado desde la web. Total: ${total}`,
-    createdBy: "WEB-ULTIMATE-KITS",
-    items: cart.map(p => ({
-      nombre: p.nombre,
-      liga: p.liga,
-      club: p.club,
-      tipo: p.tipo,
-      edicion: p.edicion,
-      temporada: p.temporada,
-      precio: p.precio,
-      img: p.img,
-      size: p.size,
-      customName: p.customName,
-      customNumber: p.customNumber,
-      patches: p.patches,
-      notes: p.notes
-    }))
-  };
-
-  await fetch(ORDERS_WEBAPP_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  return orderId;
-}
-
 // ==============================
-// DOM
+// Ediciones chips (solo fútbol)
 // ==============================
-const MODE = document.body.dataset.mode; // "football" | "f1"
+function renderEditionChips() {
+  if (!editionChips) return;
 
-const grid = document.getElementById("grid");
-const emptyEl = document.getElementById("empty");
-const activeFiltersEl = document.getElementById("activeFilters");
-const loadMoreBtn = document.getElementById("loadMoreBtn");
-
-const qEl = document.getElementById("q");
-const clearBtn = document.getElementById("clearBtn");
-
-const editionChips = document.getElementById("editionChips"); // solo fútbol
-const f1TeamsEl = document.getElementById("f1Teams");         // solo f1
-
-const clubSel = document.getElementById("club");   // solo fútbol
-const tipoSel = document.getElementById("tipo");   // ambos
-const precioSel = document.getElementById("precio"); // ambos
-
-// Modal pedido
-const modal = document.getElementById("orderModal");
-const closeModalBtn = document.getElementById("closeModal");
-const cancelOrderBtn = document.getElementById("cancelOrder");
-const productSummary = document.getElementById("productSummary");
-const orderForm = document.getElementById("orderForm");
-let selectedProduct = null;
-
-// Carrito
-const cartBar = document.getElementById("cartBar");
-const cartCountEl = document.getElementById("cartCount");
-const cartOpenBtn = document.getElementById("cartOpenBtn");
-const cartSendBtn = document.getElementById("cartSendBtn");
-
-const cartModal = document.getElementById("cartModal");
-const closeCartBtn = document.getElementById("closeCart");
-const cartList = document.getElementById("cartList");
-const cartTotalEl = document.getElementById("cartTotal");
-const cartClearBtn = document.getElementById("cartClearBtn");
-const cartSendBtn2 = document.getElementById("cartSendBtn2");
-
-const CART_KEY = "uk_cart_v1";
-let cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-
-// ==============================
-// Estado
-// ==============================
-const state = {
-  mode: MODE,          // fijo por página
-  f1Team: "all",
-  edicion: "all",
-  club: "all",
-  tipo: "all",
-  precio: "all",
-  q: ""
-};
-
-// ==============================
-// UI: Active filters
-// ==============================
-function renderActive(){
-  if(!activeFiltersEl) return;
-
-  const parts = [];
-  if(state.mode === "f1"){
-    parts.push("Modo: F1");
-    if(state.f1Team !== "all") parts.push(`Escudería: ${state.f1Team}`);
-  } else {
-    parts.push("Modo: Fútbol");
-    if(state.edicion !== "all") parts.push(`Edición: ${state.edicion}`);
-    if(state.club !== "all") parts.push(`Club: ${state.club}`);
-  }
-
-  if(state.tipo !== "all") parts.push(`Tipo: ${state.tipo}`);
-  if(state.precio !== "all") parts.push(`Precio: ${money(state.precio)}`);
-  if(state.q) parts.push(`Buscar: “${state.q}”`);
-
-  activeFiltersEl.innerHTML = parts.length
-    ? `<span class="afLabel">Filtros:</span> ${parts.map(p => `<span class="afPill">${p}</span>`).join("")}`
-    : `<span class="afLabel muted">Sin filtros activos</span>`;
-}
-
-// ==============================
-// Ediciones (solo fútbol)
-// ==============================
-function renderEditionChips(){
-  if(!editionChips) return;
-  if(state.mode !== "football"){
+  if (state.mode !== "football") {
     editionChips.style.display = "none";
     return;
   }
 
   editionChips.style.display = "flex";
-  const base = ["Fan","Player","Retro","Edición especial"];
+  const base = ["Fan", "Player", "Retro", "Edición especial"];
   const all = ["all", ...base];
 
   editionChips.innerHTML = all.map(v => {
     const label = v === "all" ? "Todo" : v;
-    const on = (state.edicion === v);
+    const on = state.edicion === v;
     return `<button class="chip ${on ? "isOn" : ""}" data-ed="${v}" type="button">${label}</button>`;
   }).join("");
 
-  editionChips.querySelectorAll("button").forEach(btn => {
+  const btns = editionChips.querySelectorAll("button[data-ed]");
+  btns.forEach(btn => {
     btn.addEventListener("click", () => {
-      state.edicion = btn.dataset.ed;
+      state.edicion = btn.getAttribute("data-ed") || "all";
       renderEditionChips();
       fetchPage(true);
     });
@@ -244,150 +232,136 @@ function renderEditionChips(){
 }
 
 // ==============================
-// Escuderías (solo F1)
+// Fetch catálogo
 // ==============================
-function renderF1Teams(teams){
-  if(!f1TeamsEl) return;
-  if(state.mode !== "f1"){
-    f1TeamsEl.style.display = "none";
-    return;
-  }
-
-  f1TeamsEl.style.display = "flex";
-
-  f1TeamsEl.innerHTML =
-    `<button class="chip isOn" type="button" data-team="all">Todas</button>` +
-    teams.map(t => `<button class="chip" type="button" data-team="${t}">${t}</button>`).join("");
-
-  f1TeamsEl.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-team]");
-    if(!btn) return;
-
-    f1TeamsEl.querySelectorAll(".chip").forEach(b => b.classList.remove("isOn"));
-    btn.classList.add("isOn");
-
-    state.f1Team = btn.dataset.team || "all";
-    fetchPage(true);
-  });
-}
-
-// ==============================
-// Paginación / Fetch
-// ==============================
-let items = [];
-let page = 1;
-const limit = 60;
-let total = 0;
-let loading = false;
-
-async function fetchPage(reset=false){
-  if(loading) return;
-  loading = true;
-
-  if(reset){
-    page = 1;
-    items = [];
-    if(grid) grid.innerHTML = "";
-  }
-
+function buildParams() {
   const params = new URLSearchParams();
   params.set("page", String(page));
-  params.set("limit", String(limit));
+  params.set("limit", String(DEFAULT_LIMIT));
   params.set("q", state.q || "");
   params.set("tipo", state.tipo);
   params.set("precio", state.precio);
 
-  if(state.mode === "f1"){
-    // Separación REAL
+  if (state.mode === "f1") {
     params.set("liga", "F1");
-    params.set("club", state.f1Team); // escudería
+    params.set("club", state.f1Team);
     params.set("edicion", "all");
   } else {
-    // Fútbol (NO F1)
+    // Fútbol: no forzamos liga porque tu API no soporta NOT
     params.set("liga", "all");
     params.set("club", state.club);
     params.set("edicion", state.edicion);
   }
 
-try{
-  const pageMode = (document.body.dataset.mode || state?.mode || "").toLowerCase();
+  return params;
+}
 
-  let data = await loadJSONP(API_URL + "?" + params.toString());
-  total = Number(data.total || 0);
-
-  let newItems = data.items || [];
-
-  // ✅ filtro anti F1 en fútbol
-  const filterOutF1 = (arr) => arr.filter(it => {
+function filterOutF1(arr) {
+  return (arr || []).filter(it => {
     const liga = String(it.liga || "").toLowerCase().trim();
-
-    // si liga viene vacío, NO lo mates (así no te quedas sin items)
     if (!liga) return true;
-
-    // saca F1
     return liga !== "f1" && !liga.includes("formula 1");
   });
+}
 
-  let safeItems = (pageMode === "football") ? filterOutF1(newItems) : newItems;
+async function fetchPage(reset = false) {
+  if (loading) return;
+  loading = true;
 
-  // ✅ AUTO-SKIP: si estamos en fútbol y esta página quedó vacía por ser solo F1,
-  // busca en las siguientes páginas (hasta 8 intentos)
-  let guard = 0;
-  while (pageMode === "football" && newItems.length > 0 && safeItems.length === 0 && guard < 8) {
-    guard++;
+  try {
+    if (reset) {
+      page = 1;
+      allItems = [];
+      if (grid) grid.innerHTML = "";
+    }
 
-    page += 1; // saltamos a la siguiente
-    const params2 = new URLSearchParams(params);
-    params2.set("page", String(page));
+    const params = buildParams();
 
-    data = await loadJSONP(API_URL + "?" + params2.toString());
-    newItems = data.items || [];
-    safeItems = filterOutF1(newItems);
+    // ✅ intentos para “saltar” páginas que sean solo F1 cuando estás en fútbol
+    let guard = 0;
+    let rawItems = [];
+    let safeItems = [];
+
+    while (guard < 10) {
+      params.set("page", String(page));
+
+      const data = await loadJSONP(API_URL + "?" + params.toString());
+      total = Number(data && data.total ? data.total : 0);
+
+      rawItems = (data && data.items) ? data.items : [];
+
+      // si la API ya no devuelve nada, se acabó
+      if (rawItems.length === 0) {
+        safeItems = [];
+        break;
+      }
+
+      // aplicar filtro anti-F1 SOLO en fútbol
+      safeItems = (state.mode === "football") ? filterOutF1(rawItems) : rawItems;
+
+      // ✅ si estamos en fútbol y esta página quedó vacía porque era solo F1 → saltar a la siguiente
+      if (state.mode === "football" && safeItems.length === 0) {
+        page += 1;
+        guard += 1;
+        continue;
+      }
+
+      // si ya hay items válidos, salimos
+      break;
+    }
+
+    // acumulamos
+    allItems = allItems.concat(safeItems);
+
+    if (grid) grid.innerHTML = allItems.map(cardHTML).join("");
+    if (emptyEl) emptyEl.hidden = allItems.length !== 0;
+
+    renderActive();
+
+    // ✅ el botón depende de la API (rawItems), NO de safeItems
+    if (loadMoreBtn) loadMoreBtn.hidden = (rawItems.length === 0);
+
+    // siguiente página
+    page += 1;
+
+  } catch (err) {
+    console.error(err);
+    if (grid) grid.innerHTML = `<p class="muted">No se pudo cargar el catálogo. Revisa tu API (Apps Script).</p>`;
+  } finally {
+    loading = false;
   }
-
-  // ✅ acumulamos solo lo seguro
-  items = items.concat(safeItems);
-
-  if(grid) grid.innerHTML = items.map(cardHTML).join("");
-  if(emptyEl) emptyEl.hidden = items.length !== 0;
-
-  renderActive();
-
-  // ✅ botón cargar más: si la API ya no devuelve nada, se oculta
-  if(loadMoreBtn) loadMoreBtn.hidden = (newItems.length === 0);
-
-  page += 1;
-
-}catch(err){
-  console.error(err);
-  if(grid) grid.innerHTML = `<p class="muted">No se pudo cargar el catálogo. Revisa tu API (Apps Script).</p>`;
-}finally{
-  loading = false;
-}}
-
+}
 
 
 // ==============================
 // Carrito
 // ==============================
-function saveCart(){
+let cart = [];
+try {
+  cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+  if (!Array.isArray(cart)) cart = [];
+} catch (e) {
+  cart = [];
+}
+
+function saveCart() {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
   updateCartBar();
 }
 
-function updateCartBar(){
-  if(!cartBar || !cartCountEl) return;
+function updateCartBar() {
+  if (!cartBar || !cartCountEl) return;
   const n = cart.length;
   cartBar.style.display = n ? "block" : "none";
   cartCountEl.textContent = `${n} item${n === 1 ? "" : "s"}`;
 }
 
-function cartItemHTML(item, idx){
+function cartItemHTML(item, idx) {
   return `
-    <div style="display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px;">
-      <img src="${item.img}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:12px;flex:0 0 auto;">
+    <div class="panel" style="padding:12px; display:flex; gap:12px; align-items:flex-start;">
+      <img src="${item.img}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:14px;flex:0 0 auto;">
       <div style="flex:1;">
-        <strong>${item.nombre}</strong>
+        <strong>${item.nombre || "Producto"}</strong>
         <div class="muted" style="margin-top:4px;">
           ${[item.liga, item.club, item.tipo, item.edicion].filter(Boolean).join(" · ")}
         </div>
@@ -405,7 +379,7 @@ function cartItemHTML(item, idx){
             <span>Talla</span>
             <select data-cart="size" data-idx="${idx}">
               <option value="">Selecciona talla</option>
-              ${["XS","S","M","L","XL","2XL"].map(s => `<option ${item.size === s ? "selected" : ""}>${s}</option>`).join("")}
+              ${["XS","S","M","L","XL","2XL"].map(s => `<option value="${s}" ${item.size === s ? "selected" : ""}>${s}</option>`).join("")}
             </select>
           </label>
           <label class="field" style="margin:0;">
@@ -427,116 +401,73 @@ function cartItemHTML(item, idx){
   `;
 }
 
-function renderCart(){
-  if(!cartList || !cartTotalEl) return;
-  cartList.innerHTML = cart.map(cartItemHTML).join("") || `<p class="muted">Tu carrito está vacío.</p>`;
+function renderCart() {
+  if (!cartList || !cartTotalEl) return;
+
+  if (!cart.length) {
+    cartList.innerHTML = `<p class="muted">Tu carrito está vacío.</p>`;
+    cartTotalEl.textContent = "";
+    updateCartBar();
+    return;
+  }
+
+  cartList.innerHTML = cart.map(cartItemHTML).join("");
   const t = cart.reduce((sum, x) => sum + Number(x.precio || 0), 0);
-  cartTotalEl.textContent = cart.length ? `Total estimado: ${money(t)}` : "";
+  cartTotalEl.textContent = `Total estimado: ${money(t)}`;
   updateCartBar();
 }
 
-function openCart(){
+function openCart() {
   renderCart();
-  if(!cartModal) return;
+  if (!cartModal) return;
   cartModal.hidden = false;
   document.body.style.overflow = "hidden";
 }
 
-function closeCart(){
-  if(!cartModal) return;
+function closeCart() {
+  if (!cartModal) return;
   cartModal.hidden = true;
   document.body.style.overflow = "";
 }
 
-closeCartBtn?.addEventListener("click", closeCart);
-cartModal?.addEventListener("click", (e) => { if(e.target === cartModal) closeCart(); });
-cartOpenBtn?.addEventListener("click", openCart);
+if (closeCartBtn) closeCartBtn.addEventListener("click", closeCart);
+if (cartModal) cartModal.addEventListener("click", (e) => { if (e.target === cartModal) closeCart(); });
+if (cartOpenBtn) cartOpenBtn.addEventListener("click", openCart);
 
-cartClearBtn?.addEventListener("click", () => {
+if (cartClearBtn) cartClearBtn.addEventListener("click", () => {
   cart = [];
   saveCart();
   renderCart();
 });
 
-async function sendCartToWhatsApp(){
-  if(!cart.length) return;
-
-  // 🔹 1) GUARDAR PEDIDO EN APPSHEET
-  let orderId = "";
-  try {
-    orderId = await saveOrderToAppSheetFromWeb(cart);
-  } catch (err) {
-    console.error("Error guardando pedido", err);
-    alert("Error guardando el pedido. Intenta nuevamente.");
-    return; // ⛔ NO abrimos WhatsApp
-  }
-
-  // 🔹 2) TU CÓDIGO ORIGINAL (WhatsApp)
-  const blocks = cart.map((p, i) => {
-    const lines = [
-      `🧾 Item #${i + 1}`,
-      `• Producto: ${p.nombre || ""}`.trim(),
-      p.club ? `• Club/Escudería: ${p.club}` : null,
-      p.liga ? `• Categoría: ${p.liga}` : null,
-      p.tipo ? `• Tipo: ${p.tipo}` : null,
-      p.edicion ? `• Edición: ${p.edicion}` : null,
-      p.size ? `• Talla: ${p.size}` : `• Talla: (sin talla)`,
-      p.customName ? `• Nombre: ${p.customName}` : `• Nombre: (sin nombre)`,
-      p.customNumber ? `• Número: ${p.customNumber}` : `• Número: (sin número)`,
-      p.patches ? `• Parches: ${p.patches}` : null,
-      `• Foto: ${p.img}`,
-      `• Precio: ${money(p.precio)}`,
-      p.notes ? `• Notas: ${p.notes}` : null
-    ].filter(Boolean);
-
-    return lines.join("\n");
-  });
-
-  const header = [
-    "Hola Ultimate Kits 👋",
-    "Pedido WEB registrado correctamente ✅",
-    `OrderID: ${orderId}`,
-    "",
-    "Quiero hacer este pedido (carrito):",
-    ""
-  ].join("\n");
-
-  const text = encodeURIComponent(
-    header + blocks.join("\n\n" + "—".repeat(12) + "\n\n")
-  );
-
-  // 🔹 3) ABRIR WHATSAPP (solo si guardó)
-  window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-}
-
-
-cartSendBtn?.addEventListener("click", sendCartToWhatsApp);
-cartSendBtn2?.addEventListener("click", sendCartToWhatsApp);
-
 // Inputs del carrito
 document.addEventListener("input", (e) => {
   const el = e.target;
+  if (!el || !el.dataset) return;
+
   const key = el.dataset.cart;
-  if(!key) return;
+  if (!key) return;
 
   const idx = Number(el.dataset.idx);
-  if(!Number.isFinite(idx) || !cart[idx]) return;
+  if (!Number.isFinite(idx) || !cart[idx]) return;
 
-  if(key === "name") cart[idx].customName = el.value;
-  if(key === "number") cart[idx].customNumber = el.value;
-  if(key === "patches") cart[idx].patches = el.value;
-  if(key === "notes") cart[idx].notes = el.value;
+  if (key === "name") cart[idx].customName = el.value;
+  if (key === "number") cart[idx].customNumber = el.value;
+  if (key === "patches") cart[idx].patches = el.value;
+  if (key === "notes") cart[idx].notes = el.value;
 
   saveCart();
 });
 
 document.addEventListener("change", (e) => {
   const el = e.target;
+  if (!el || !el.dataset) return;
+
   const key = el.dataset.cart;
-  if(key !== "size") return;
+  if (key !== "size") return;
 
   const idx = Number(el.dataset.idx);
-  if(!Number.isFinite(idx) || !cart[idx]) return;
+  if (!Number.isFinite(idx) || !cart[idx]) return;
 
   cart[idx].size = el.value;
   saveCart();
@@ -544,97 +475,223 @@ document.addEventListener("change", (e) => {
 
 document.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-cart='remove']");
-  if(!btn) return;
+  if (!btn) return;
+
   const idx = Number(btn.dataset.idx);
-  if(!Number.isFinite(idx)) return;
+  if (!Number.isFinite(idx)) return;
+
   cart.splice(idx, 1);
   saveCart();
   renderCart();
 });
 
 // ==============================
-// Modal pedido individual
+// Modal pedido individual (Pedir)
 // ==============================
-function openModal(product){
+let selectedProduct = null;
+
+function openOrderModal(product) {
   selectedProduct = product;
-  if(productSummary){
+
+  if (productSummary) {
     const line = [product.edicion || "", product.club || "", product.tipo || "", money(product.precio)]
       .filter(Boolean).join(" · ");
     productSummary.textContent = line;
   }
-  if(modal) modal.hidden = false;
+
+  if (orderModal) orderModal.hidden = false;
   document.body.style.overflow = "hidden";
-  orderForm?.reset();
+  if (orderForm) orderForm.reset();
 }
 
-function closeModal(){
-  if(modal) modal.hidden = true;
+function closeOrderModal() {
+  if (orderModal) orderModal.hidden = true;
   document.body.style.overflow = "";
   selectedProduct = null;
 }
 
-closeModalBtn?.addEventListener("click", closeModal);
-cancelOrderBtn?.addEventListener("click", closeModal);
-modal?.addEventListener("click", (e) => { if(e.target === modal) closeModal(); });
+if (closeModalBtn) closeModalBtn.addEventListener("click", closeOrderModal);
+if (cancelOrderBtn) cancelOrderBtn.addEventListener("click", closeOrderModal);
+if (orderModal) orderModal.addEventListener("click", (e) => { if (e.target === orderModal) closeOrderModal(); });
 
+// Click en cards (Pedir / Añadir)
 document.addEventListener("click", (e) => {
   const orderBtn = e.target.closest("a.js-order");
   const addBtn = e.target.closest("a.js-add");
-  if(!orderBtn && !addBtn) return;
+  if (!orderBtn && !addBtn) return;
 
   e.preventDefault();
-  const btn = orderBtn || addBtn;
-  const id = btn.dataset.id;
-  const product = items.find(x => x.id === id);
-  if(!product) return;
 
-  if(addBtn){
+  const btn = orderBtn || addBtn;
+  const id = btn.getAttribute("data-id");
+  const product = allItems.find(x => x.id === id);
+  if (!product) return;
+
+  if (addBtn) {
     cart.push({ ...product, customName:"", customNumber:"", size:"", patches:"", notes:"" });
     saveCart();
     updateCartBar();
     return;
   }
 
-  openModal(product);
+  openOrderModal(product);
 });
 
-orderForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if(!selectedProduct) return;
+// Submit pedido individual -> WhatsApp
+if (orderForm) {
+  orderForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!selectedProduct) return;
 
-  const shirtName = (document.getElementById("shirtName")?.value || "").trim();
-  const shirtNumber = (document.getElementById("shirtNumber")?.value || "").trim();
-  const shirtSize = document.getElementById("shirtSize")?.value || "";
-  const patches = (document.getElementById("patches")?.value || "").trim();
-  const notes = (document.getElementById("notes")?.value || "").trim();
+    const shirtName = (document.getElementById("shirtName")?.value || "").trim();
+    const shirtNumber = (document.getElementById("shirtNumber")?.value || "").trim();
+    const shirtSize = (document.getElementById("shirtSize")?.value || "");
+    const patches = (document.getElementById("patches")?.value || "").trim();
+    const notes = (document.getElementById("notes")?.value || "").trim();
 
-  const lines = [
-    "Hola Ultimate Kits 👋",
-    "Quiero pedir:",
-    "",
-    `• Producto: ${selectedProduct.nombre || ""}`.trim(),
-    selectedProduct.club ? `• Club/Escudería: ${selectedProduct.club}` : null,
-    selectedProduct.liga ? `• Categoría: ${selectedProduct.liga}` : null,
-    selectedProduct.tipo ? `• Tipo: ${selectedProduct.tipo}` : null,
-    selectedProduct.edicion ? `• Edición: ${selectedProduct.edicion}` : null,
-    shirtSize ? `• Talla: ${shirtSize}` : "• Talla: (sin talla)",
-    shirtName ? `• Nombre camiseta: ${shirtName}` : "• Nombre camiseta: (sin nombre)",
-    shirtNumber ? `• Número: ${shirtNumber}` : "• Número: (sin número)",
-    patches ? `• Parches: ${patches}` : null,
-    `• Foto: ${selectedProduct.img}`,
-    `• Precio: ${money(selectedProduct.precio)}`,
-    notes ? `• Notas: ${notes}` : null,
-    "",
-    "Gracias!"
-  ].filter(Boolean);
+    const orderId = makeOrderId();
 
-  window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
-});
+    const lines = [
+      "Hola Ultimate Kits 👋",
+      "Quiero pedir este producto:",
+      "",
+      `OrderID: ${orderId}`,
+      "",
+      `• Producto: ${selectedProduct.nombre || ""}`.trim(),
+      selectedProduct.club ? `• Club/Escudería: ${selectedProduct.club}` : null,
+      selectedProduct.liga ? `• Categoría: ${selectedProduct.liga}` : null,
+      selectedProduct.tipo ? `• Tipo: ${selectedProduct.tipo}` : null,
+      selectedProduct.edicion ? `• Edición: ${selectedProduct.edicion}` : null,
+      shirtSize ? `• Talla: ${shirtSize}` : "• Talla: (sin talla)",
+      shirtName ? `• Nombre camiseta: ${shirtName}` : "• Nombre camiseta: (sin nombre)",
+      shirtNumber ? `• Número: ${shirtNumber}` : "• Número: (sin número)",
+      patches ? `• Parches: ${patches}` : null,
+      `• Foto: ${selectedProduct.img}`,
+      `• Precio: ${money(selectedProduct.precio)}`,
+      notes ? `• Notas: ${notes}` : null,
+      "",
+      "Gracias!"
+    ].filter(Boolean);
+
+    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+  });
+}
 
 // ==============================
-// Init
+// Checkout modal (datos envío) para carrito
 // ==============================
-function debounce(fn, wait=250){
+function openCheckout() {
+  if (!checkoutModal) return;
+  checkoutModal.hidden = false;
+  document.body.style.overflow = "hidden";
+  if (checkoutForm) checkoutForm.reset();
+}
+
+function closeCheckout() {
+  if (!checkoutModal) return;
+  checkoutModal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+// cerrar checkout con backdrop o botones data-close
+if (checkoutModal) {
+  checkoutModal.addEventListener("click", (e) => {
+    const closeBtn = e.target.closest("[data-close='1']");
+    if (closeBtn || e.target === checkoutModal) closeCheckout();
+  });
+}
+
+// Botones enviar carrito -> abre checkout
+function startCartCheckout() {
+  if (!cart.length) return;
+  closeCart();
+  openCheckout();
+}
+
+if (cartSendBtn) cartSendBtn.addEventListener("click", startCartCheckout);
+if (cartSendBtn2) cartSendBtn2.addEventListener("click", startCartCheckout);
+
+// Submit checkout -> WhatsApp con OrderID + datos
+if (checkoutForm) {
+  checkoutForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!cart.length) return;
+
+    const fd = new FormData(checkoutForm);
+    const nombre = String(fd.get("nombre") || "").trim();
+    const direccion = String(fd.get("direccion") || "").trim();
+    const postal = String(fd.get("postal") || "").trim();
+    const ciudad = String(fd.get("ciudad") || "").trim();
+    const pais = String(fd.get("pais") || "").trim();
+    const telefono = String(fd.get("telefono") || "").trim();
+
+    // Validación simple
+    if (!nombre || !direccion || !postal || !ciudad || !pais || !telefono) {
+      alert("Por favor rellena todos los campos del envío.");
+      return;
+    }
+
+    const orderId = makeOrderId();
+    const totalAmount = cart.reduce((sum, p) => sum + Number(p.precio || 0), 0);
+
+    const blocks = cart.map((p, i) => {
+      const lines = [
+        `🧾 Item #${i + 1}`,
+        `• Producto: ${p.nombre || ""}`.trim(),
+        p.club ? `• Club/Escudería: ${p.club}` : null,
+        p.liga ? `• Categoría: ${p.liga}` : null,
+        p.tipo ? `• Tipo: ${p.tipo}` : null,
+        p.edicion ? `• Edición: ${p.edicion}` : null,
+        p.temporada ? `• Temporada: ${p.temporada}` : null,
+        p.size ? `• Talla: ${p.size}` : `• Talla: (sin talla)`,
+        p.customName ? `• Nombre: ${p.customName}` : `• Nombre: (sin nombre)`,
+        p.customNumber ? `• Número: ${p.customNumber}` : `• Número: (sin número)`,
+        p.patches ? `• Parches: ${p.patches}` : null,
+        p.notes ? `• Notas: ${p.notes}` : null,
+        `• Foto: ${p.img}`,
+        `• Precio: ${money(p.precio)}`
+      ].filter(Boolean);
+
+      return lines.join("\n");
+    });
+
+    const header = [
+      "Hola Ultimate Kits 👋",
+      "Quiero hacer este pedido (carrito):",
+      "",
+      `OrderID: ${orderId}`,
+      "",
+      "📦 Datos de envío:",
+      `• Nombre: ${nombre}`,
+      `• Teléfono: ${telefono}`,
+      `• Dirección: ${direccion}`,
+      `• Código postal: ${postal}`,
+      `• Ciudad: ${ciudad}`,
+      `• País: ${pais}`,
+      "",
+      `💰 Total estimado: ${money(totalAmount)}`,
+      "",
+      "🛒 Items:",
+      ""
+    ].join("\n");
+
+    const text = encodeURIComponent(header + blocks.join("\n\n" + "—".repeat(12) + "\n\n"));
+    closeCheckout();
+    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+  });
+}
+
+// ==============================
+// Paginación: Cargar más
+// ==============================
+if (loadMoreBtn) {
+  loadMoreBtn.addEventListener("click", () => fetchPage(false));
+}
+
+// ==============================
+// Filtros
+// ==============================
+function debounce(fn, wait = 250) {
   let t;
   return (...args) => {
     clearTimeout(t);
@@ -642,50 +699,19 @@ function debounce(fn, wait=250){
   };
 }
 
-async function init(){
-  const y = document.getElementById("year");
-  if(y) y.textContent = new Date().getFullYear();
+if (tipoSel) tipoSel.addEventListener("change", () => { state.tipo = tipoSel.value; fetchPage(true); });
+if (precioSel) precioSel.addEventListener("change", () => { state.precio = precioSel.value; fetchPage(true); });
+if (clubSel) clubSel.addEventListener("change", () => { state.club = clubSel.value; fetchPage(true); });
 
-  const metaData = await loadJSONP(API_URL + "?mode=meta");
-  const meta = metaData.meta || { clubs: [], tipos: [], precios: [], f1Teams: [] };
-
-  // Selects comunes
-  setOptions(tipoSel, meta.tipos || [], "Todos");
-  if(precioSel){
-    precioSel.innerHTML =
-      `<option value="all">Todos</option>` +
-      (meta.precios || []).map(v => `<option value="${v}">${priceLabelUSD(Number(v))}</option>`).join("");
-  }
-
-  // Fútbol
-  if(state.mode === "football"){
-    renderEditionChips();
-    setOptions(clubSel, meta.clubs || [], "Todos");
-
-    clubSel?.addEventListener("change", () => { state.club = clubSel.value; fetchPage(true); });
-  }
-
-  // F1
-  if(state.mode === "f1"){
-    const fallbackTeams = [
-      "Alpine","Aston Martin","Ferrari","Haas","Kick Sauber",
-      "McLaren","Mercedes","RB VISA","Red Bull","Williams"
-    ];
-    const rawTeams = (meta.f1Teams || meta.f1teams || []);
-    const teams = unique(rawTeams.length ? rawTeams : fallbackTeams);
-    renderF1Teams(teams);
-  }
-
-  // Listeners comunes
-  tipoSel?.addEventListener("change", () => { state.tipo = tipoSel.value; fetchPage(true); });
-  precioSel?.addEventListener("change", () => { state.precio = precioSel.value; fetchPage(true); });
-
-  qEl?.addEventListener("input", debounce(() => {
+if (qEl) {
+  qEl.addEventListener("input", debounce(() => {
     state.q = norm(qEl.value);
     fetchPage(true);
   }, 250));
+}
 
-  clearBtn?.addEventListener("click", () => {
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
     state.f1Team = "all";
     state.edicion = "all";
     state.club = "all";
@@ -693,26 +719,49 @@ async function init(){
     state.precio = "all";
     state.q = "";
 
-    if(qEl) qEl.value = "";
-    if(tipoSel) tipoSel.value = "all";
-    if(precioSel) precioSel.value = "all";
-    if(clubSel) clubSel.value = "all";
+    if (qEl) qEl.value = "";
+    if (tipoSel) tipoSel.value = "all";
+    if (precioSel) precioSel.value = "all";
+    if (clubSel) clubSel.value = "all";
 
-    // reset chips
-    if(editionChips) renderEditionChips();
-    if(f1TeamsEl){
-      f1TeamsEl.querySelectorAll(".chip").forEach(b => b.classList.remove("isOn"));
-      f1TeamsEl.querySelector(`.chip[data-team="all"]`)?.classList.add("isOn");
-    }
-
+    renderEditionChips();
     fetchPage(true);
   });
+}
+
+// ==============================
+// Init
+// ==============================
+async function init() {
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
 
   updateCartBar();
-  fetchPage(true);
+  renderEditionChips();
+
+  // 1) meta
+  const metaData = await loadJSONP(API_URL + "?mode=meta");
+  const meta = metaData && metaData.meta ? metaData.meta : { clubs: [], tipos: [], precios: [], f1Teams: [] };
+
+  // selects comunes
+  setOptions(tipoSel, meta.tipos || [], "Todos");
+
+  if (precioSel) {
+    precioSel.innerHTML =
+      `<option value="all">Todos</option>` +
+      (meta.precios || []).map(v => `<option value="${v}">${priceLabelUSD(Number(v))}</option>`).join("");
+  }
+
+  // fútbol: clubs
+  if (state.mode === "football") {
+    setOptions(clubSel, meta.clubs || [], "Todos");
+  }
+
+  // 2) primera página
+  await fetchPage(true);
 }
 
 init().catch(err => {
   console.error(err);
-  if(grid) grid.innerHTML = `<p class="muted">No se pudo iniciar el catálogo. Revisa tu Apps Script.</p>`;
+  if (grid) grid.innerHTML = `<p class="muted">No se pudo iniciar el catálogo. Revisa tu Apps Script.</p>`;
 });

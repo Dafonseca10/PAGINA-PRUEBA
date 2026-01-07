@@ -173,6 +173,60 @@
       </div>
     </div>
   </div>
+  <!-- ===== Modal: datos de envío antes de WhatsApp ===== -->
+<!-- MODAL CHECKOUT (datos envío antes de WhatsApp) -->
+<div class="modal" id="checkoutModal" hidden>
+  <div class="modalCard" style="max-width:760px;">
+    <div class="modalTop">
+      <strong>Datos para el envío</strong>
+      <button class="modalClose" type="button" data-close="1" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="modalBody">
+      <form id="checkoutForm" class="form">
+        <label>
+          Nombre
+          <input name="nombre" type="text" required>
+        </label>
+
+        <label>
+          Teléfono
+          <input name="telefono" type="tel" required>
+        </label>
+
+        <label>
+          Dirección
+          <input name="direccion" type="text" required>
+        </label>
+
+        <label>
+          Código postal
+          <input name="postal" type="text" required>
+        </label>
+
+        <label>
+          Ciudad
+          <input name="ciudad" type="text" required>
+        </label>
+
+        <label>
+          País
+          <input name="pais" type="text" required>
+        </label>
+
+        <div class="formActions">
+          <button type="button" class="btn btnGhost" data-close="1">Cancelar</button>
+          <button type="submit" class="btn">Abrir WhatsApp</button>
+        </div>
+
+        <p class="muted" style="margin-top:10px;font-size:.9rem;">
+          Se abrirá WhatsApp con el pedido y tus datos de envío.
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
 
   <script src="js/main.js"></script>
   <script src="js/catalogo.js"></script>
