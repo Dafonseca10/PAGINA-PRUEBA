@@ -34,84 +34,100 @@
 <div class="navOverlay" id="navOverlay" hidden></div>
     </header>
 
-    <main class="page">
-   <section class="supportCard">
-  <h1>Atención al cliente</h1>
-  <p class="muted">Cuéntanos tu duda, problema o propuesta. Te respondemos por WhatsApp.</p>
+<main class="page">
+  <section class="pageContainer">
+    <header class="pageHead">
+      <h1>Atención al cliente</h1>
+      <p class="muted">Cuéntanos tu duda o idea y te respondemos por WhatsApp.</p>
+    </header>
 
+    <div class="supportLayout">
+      <!-- FORM -->
+      <section class="supportCard">
+        <form id="supportForm" class="supportForm">
+          <div class="formGrid">
+            <label class="field">
+              <span>Tu nombre</span>
+              <input id="s_name" type="text" placeholder="Ej: Juan" required>
+            </label>
 
+            <label class="field">
+              <span>Motivo</span>
+              <select id="s_reason" required>
+                <option value="Consulta general">Consulta general</option>
+                <option value="Problema con pedido">Problema con pedido</option>
+                <option value="Estado de envío">Estado de envío</option>
+                <option value="Idea de negocio">Idea de negocio</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </label>
 
+            <label class="field formFull">
+              <span>N° de pedido (opcional)</span>
+              <input id="s_order" type="text" placeholder="Ej: 123123">
+            </label>
 
+            <label class="field formFull">
+              <span>Mensaje</span>
+              <textarea id="s_msg" rows="6" placeholder="Explícanos tu caso con el máximo detalle..." required></textarea>
+            </label>
+          </div>
 
-    <section class="container" style="margin-top:24px;">
-  <h1>Atención al cliente</h1>
-  <p class="muted">Cuéntanos tu duda o idea y te respondemos por WhatsApp.</p>
+          <div class="formActions">
+            <button class="btnWhatsapp" type="submit">
+              Enviar a WhatsApp
+              <span class="btnArrow">↗</span>
+            </button>
+          </div>
 
-  <form id="supportForm" class="form" style="margin-top:16px;">
-    <label class="field">
-      <span>Tu nombre</span>
-      <input id="s_name" type="text" placeholder="Ej: Juan" required>
-    </label>
+          <p class="muted formNote">
+            Recibiremos tu mensaje y te daremos una respuesta lo más pronto posible.
+          </p>
+        </form>
+      </section>
 
-    <label class="field">
-      <span>Motivo</span>
-      <select id="s_reason" required>
-        <option value="Consulta general">Consulta general</option>
-        <option value="Problema con pedido">Problema con pedido</option>
-        <option value="Estado de envío">Estado de envío</option>
-        <option value="Idea de negocio">Idea de negocio</option>
-        <option value="Otro">Otro</option>
-      </select>
-    </label>
+      <!-- FAQ -->
+      <aside class="faqCard">
+        <h2>Preguntas frecuentes</h2>
 
-    <label class="field">
-      <span>N° de pedido (opcional)</span>
-      <input id="s_order" type="text" placeholder="Ej: 123123">
-    </label>
+        <details class="faqItem" open>
+          <summary>¿Cuánto tardan los pedidos en llegar a mi casa?</summary>
+          <p class="muted">
+            El pedido puede variar dependiendo de dónde te encuentres. Si es un pedido fuera de Suramérica tarda entre
+            15 a 20 días y si se encuentran en Suramérica entre 20 a 45 días.
+          </p>
+        </details>
 
-    <label class="field">
-      <span>Mensaje</span>
-      <textarea id="s_msg" rows="5" placeholder="Explícanos tu caso con el máximo detalle..." required></textarea>
-    </label>
+        <details class="faqItem">
+          <summary>¿Existe devoluciones o cambios?</summary>
+          <p class="muted">
+            Sí, todos los pedidos tienen sus respectivas devoluciones o cambios con una condición: el cliente tiene que
+            cortar la camiseta para la devolución o cambio.
+          </p>
+        </details>
 
-    <div class="formActions" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
-      <button class="btn" type="submit">Enviar a WhatsApp</button>
+        <details class="faqItem">
+          <summary>¿El envío es gratis?</summary>
+          <p class="muted">Sí, el envío es totalmente gratuito.</p>
+        </details>
+
+        <details class="faqItem">
+          <summary>¿Cuáles son los métodos de pago?</summary>
+          <p class="muted">Se acepta Zelle, Bizum y pago móvil (tasa correspondiente del día).</p>
+        </details>
+
+        <details class="faqItem">
+          <summary>¿Qué pasa si se retrasa mi pedido?</summary>
+          <p class="muted">
+            En ciertos casos ajenos a nosotros, los pedidos se pueden llegar a retrasar o incluso hasta perder. Si eso
+            sucede, no te preocupes que tu pedido tiene todo tipo de garantías.
+          </p>
+        </details>
+      </aside>
     </div>
-
-    <p class="muted" style="margin-top:10px;font-size:.9rem;">Se abrirá WhatsApp con el mensaje ya preparado.</p>
-  </form>
-</section>
-
-<section class="container" style="margin-top:28px;margin-bottom:40px;">
-  <h2>Preguntas frecuentes</h2>
-
-  <details class="faqItem" open>
-    <summary>¿Cuánto tardan los pedidos en llegar a mi casa?</summary>
-    <p class="muted">El pedido puede variar dependiendo de donde te encuentres. Si es un pedido fuera de Suramérica tarda entre 15 a 20 días y si se encuentran en Suramérica entre 20 a 45 días.</p>
-  </details>
-
-  <details class="faqItem">
-    <summary>¿Existe devoluciones o cambios?</summary>
-    <p class="muted">Sí, todos los pedidos tienen sus respectivas devoluciones o cambios con una condición: el cliente tiene que cortar la camiseta para la devolución o cambio.</p>
-  </details>
-
-  <details class="faqItem">
-    <summary>¿El envío es gratis?</summary>
-    <p class="muted">Sí, el envío es totalmente gratuito.</p>
-  </details>
-
-  <details class="faqItem">
-    <summary>¿Cuáles son los métodos de pago?</summary>
-    <p class="muted">Se acepta Zelle, Bizum y pago móvil (tasa correspondiente del día).</p>
-  </details>
-
-  <details class="faqItem">
-    <summary>¿Qué pasa si se retrasa mi pedido?</summary>
-    <p class="muted">En ciertos casos ajenos a nosotros, los pedidos se pueden llegar a retrasar o incluso hasta perder. Si eso sucede, no te preocupes que tu pedido tiene todo tipo de garantías.</p>
-  </details>
-</section>
-
+  </section>
 </main>
+
 
   <footer class="footer">
     <div class="container footerGrid">
@@ -121,8 +137,8 @@
       </div>
 
       <div class="footerLinks">
-        <a href="catalogo.html">Catálogo</a>
-        <a href="catalogo-futbol.html">F1</a>
+        <a href="catalogo-futbol.html">Catálogo</a>
+        <a href="catalogo-f1.html">F1</a>
         <a href="atencion.html">Atención</a>
         <a href="sobre.html">Sobre</a>
       </div>
