@@ -1,7 +1,7 @@
 // ==============================
 // CONFIG
 // ==============================
-const API_URL = "https://script.google.com/macros/s/AKfycbydcVVxmr7nfXBCQKi4SzFAOCeoCng_mHhmm2W_gVjDthQnO1PXbBcMDHG8oJqqzOj-ow/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxQ1fCIQRCBZh94mRx3tW6-L1ABz2TxBE8YOUGpDQPDoGvAQdksizP-vXAUTtIbRVVMFA/exec";
 const WHATSAPP_NUMBER = "584246392010";
 function money(n){ return `$${Number(n || 0)}`; }
 
@@ -77,6 +77,59 @@ function cardHTML(it){
       </div>
     </article>
   `;
+}
+
+const ORDERS_WEBAPP_URL = "7ef6f4db-a669-48fe-a830-692804c6f509";
+
+function makeOrderId(){
+  return "UK-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,7);
+}
+
+async function saveOrderToAppSheetFromWeb(cart){
+  const orderId = makeOrderId();
+  const total = cart.reduce((s, p) => s + Number(p.precio || 0), 0);
+
+  const payload = {
+    orderId,
+    customerId: "WEB",
+    customerName: "CLIENTE WEB",
+    status: "DRAFT",
+    total,
+    shipping: {
+      destinoFinal: "SI",
+      country: "PENDIENTE",
+      state: "PENDIENTE",
+      city: "PENDIENTE",
+      address: "PENDIENTE",
+      postal: "00000"
+    },
+    notes: `Pedido creado desde la web. Total: ${total}`,
+    createdBy: "WEB-ULTIMATE-KITS",
+    items: cart.map(p => ({
+      nombre: p.nombre,
+      liga: p.liga,
+      club: p.club,
+      tipo: p.tipo,
+      edicion: p.edicion,
+      temporada: p.temporada,
+      precio: p.precio,
+      img: p.img,
+      size: p.size,
+      customName: p.customName,
+      customNumber: p.customNumber,
+      patches: p.patches,
+      notes: p.notes
+    }))
+  };
+
+  await fetch(ORDERS_WEBAPP_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  return orderId;
 }
 
 // ==============================
@@ -405,9 +458,20 @@ cartClearBtn?.addEventListener("click", () => {
   renderCart();
 });
 
-function sendCartToWhatsApp(){
+async function sendCartToWhatsApp(){
   if(!cart.length) return;
 
+  // 🔹 1) GUARDAR PEDIDO EN APPSHEET
+  let orderId = "";
+  try {
+    orderId = await saveOrderToAppSheetFromWeb(cart);
+  } catch (err) {
+    console.error("Error guardando pedido", err);
+    alert("Error guardando el pedido. Intenta nuevamente.");
+    return; // ⛔ NO abrimos WhatsApp
+  }
+
+  // 🔹 2) TU CÓDIGO ORIGINAL (WhatsApp)
   const blocks = cart.map((p, i) => {
     const lines = [
       `🧾 Item #${i + 1}`,
@@ -428,10 +492,23 @@ function sendCartToWhatsApp(){
     return lines.join("\n");
   });
 
-  const header = ["Hola Ultimate Kits 👋", "Quiero hacer este pedido (carrito):", ""].join("\n");
-  const text = encodeURIComponent(header + blocks.join("\n\n" + "—".repeat(12) + "\n\n"));
+  const header = [
+    "Hola Ultimate Kits 👋",
+    "Pedido WEB registrado correctamente ✅",
+    `OrderID: ${orderId}`,
+    "",
+    "Quiero hacer este pedido (carrito):",
+    ""
+  ].join("\n");
+
+  const text = encodeURIComponent(
+    header + blocks.join("\n\n" + "—".repeat(12) + "\n\n")
+  );
+
+  // 🔹 3) ABRIR WHATSAPP (solo si guardó)
   window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 }
+
 
 cartSendBtn?.addEventListener("click", sendCartToWhatsApp);
 cartSendBtn2?.addEventListener("click", sendCartToWhatsApp);
