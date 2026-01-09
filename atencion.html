@@ -2,131 +2,139 @@
 <html lang="es">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Atención al cliente — Ultimate Kits</title>
-    <link rel="stylesheet" href="css/styles.css" />
-     <link rel="shortcut icon" href="/assets/CIRCULAR BLANCO (1).png" type="image/x-icon">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Atención al cliente — Ultimate Kits</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="shortcut icon" href="/assets/CIRCULAR BLANCO (1).png" type="image/x-icon">
 </head>
 
 <body>
-    <div class="topbar">
-        <p>Envío gratis · Envios a todo el mundo · Soporte 24/7</p>
-    </div>
+  <div class="topbar">
+    <p>Envío gratis · Envios a todo el mundo · Soporte 24/7</p>
+  </div>
 
-    <header class="header">
-      <a class="logo" href="index.html" aria-label="Ultimate Kits">
-  <img class="logoImg"  src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" />
-</a>
+  <header class="header">
+    <a class="logo" href="index.html" aria-label="Ultimate Kits">
+      <img class="logoImg" src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" />
+    </a>
 
-<button class="burger" id="burgerBtn" type="button"
-  aria-label="Abrir menú" aria-expanded="false">
-  <span></span><span></span><span></span>
-</button>
+    <button class="burger" id="burgerBtn" type="button" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-<nav class="nav" id="navMenu">
-  <a href="catalogo-f1.html"">F1</a>
-  <a href="catalogo-futbol.html">Camisetas</a>
-  <a href="sobre.html">Sobre Nosotros</a>
-  <a href="atencion.html">Atención al cliente</a>
-</nav>
+    <nav class="nav" id="navMenu">
+      <a href="catalogo-f1.html"">F1</a>
+  <a href=" catalogo-futbol.html">Camisetas</a>
+      <a href="sobre.html">Sobre Nosotros</a>
+      <a href="atencion.html">Atención al cliente</a>
+    </nav>
 
-<div class="navOverlay" id="navOverlay" hidden></div>
-    </header>
+    <div class="navOverlay" id="navOverlay" hidden></div>
+  </header>
 
-<main class="page">
-  <section class="pageContainer">
-    <header class="pageHead">
-      <h1>Atención al cliente</h1>
-      <p class="muted">Cuéntanos tu duda o idea y te respondemos por WhatsApp.</p>
-    </header>
+  <main class="page">
+    <section class="pageContainer">
+      <header class="pageHead">
+        <h1>Atención al cliente</h1>
+        <p class="muted">Cuéntanos tu duda o idea y te respondemos por WhatsApp.</p>
+      </header>
 
-    <div class="supportLayout">
-      <!-- FORM -->
-      <section class="supportCard">
-        <form id="supportForm" class="supportForm">
-          <div class="formGrid">
-            <label class="field">
-              <span>Tu nombre</span>
-              <input id="s_name" type="text" placeholder="Ej: Juan" required>
-            </label>
+      <div class="supportLayout">
+        <!-- FORM -->
+        <section class="supportCard">
+          <form id="supportForm" class="supportForm">
+            <div class="formGrid">
+              <label class="field">
+                <span>Tu nombre</span>
+                <input id="s_name" type="text" placeholder="Ej: Juan" required>
+              </label>
 
-            <label class="field">
-              <span>Motivo</span>
-              <select id="s_reason" required>
-                <option value="Consulta general">Consulta general</option>
-                <option value="Problema con pedido">Problema con pedido</option>
-                <option value="Estado de envío">Estado de envío</option>
-                <option value="Idea de negocio">Idea de negocio</option>
-                <option value="Otro">Otro</option>
-              </select>
-            </label>
+              <label class="field">
+                <span>Motivo</span>
+                <select id="s_reason" required>
+                  <option value="Consulta general">Consulta general</option>
+                  <option value="Problema con pedido">Problema con pedido</option>
+                  <option value="Estado de envío">Estado de envío</option>
+                  <option value="Idea de negocio">Idea de negocio</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </label>
 
-            <label class="field formFull">
-              <span>N° de pedido (opcional)</span>
-              <input id="s_order" type="text" placeholder="Ej: 123123">
-            </label>
+              <label class="field formFull">
+                <span>N° de pedido (opcional)</span>
+                <input id="s_order" type="text" placeholder="Ej: 123123">
+              </label>
 
-            <label class="field formFull">
-              <span>Mensaje</span>
-              <textarea id="s_msg" rows="6" placeholder="Explícanos tu caso con el máximo detalle..." required></textarea>
-            </label>
-          </div>
+              <label class="field formFull">
+                <span>Mensaje</span>
+                <textarea id="s_msg" rows="6" placeholder="Explícanos tu caso con el máximo detalle..."
+                  required></textarea>
+              </label>
+            </div>
 
-          <div class="formActions">
-            <button class="btnWhatsapp" type="submit">
-              Enviar a WhatsApp
-              <span class="btnArrow">↗</span>
-            </button>
-          </div>
+            <div class="formActions">
+              <button class="btnWhatsapp" type="submit">
+                Enviar a WhatsApp
+                <span class="btnArrow">↗</span>
+              </button>
+            </div>
 
-          <p class="muted formNote">
-            Recibiremos tu mensaje y te daremos una respuesta lo más pronto posible.
-          </p>
-        </form>
-      </section>
+            <p class="muted formNote">
+              Recibiremos tu mensaje y te daremos una respuesta lo más pronto posible.
+            </p>
+          </form>
+        </section>
 
-      <!-- FAQ -->
-      <aside class="faqCard">
-        <h2>Preguntas frecuentes</h2>
+        <!-- FAQ -->
+        <aside class="faqCard">
+          <h2>Preguntas frecuentes</h2>
 
-        <details class="faqItem" open>
-          <summary>¿Cuánto tardan los pedidos en llegar a mi casa?</summary>
-          <p class="muted">
-            El pedido puede variar dependiendo de dónde te encuentres. Si es un pedido fuera de Suramérica tarda entre
-            15 a 20 días y si se encuentran en Suramérica entre 20 a 45 días.
-          </p>
-        </details>
+          <details class="faqItem" open>
+            <summary>¿Cuánto tardan los pedidos en llegar a mi casa?</summary>
+            <p class="muted">
+              El pedido puede variar dependiendo de dónde te encuentres. Si es un pedido fuera de Suramérica tarda entre
+              15 a 20 días y si se encuentran en Suramérica entre 20 a 45 días.
+            </p>
+          </details>
 
-        <details class="faqItem">
-          <summary>¿Existe devoluciones o cambios?</summary>
-          <p class="muted">
-            Sí, todos los pedidos tienen sus respectivas devoluciones o cambios con una condición: el cliente tiene que
-            cortar la camiseta para la devolución o cambio.
-          </p>
-        </details>
+          <details class="faqItem">
+            <summary>¿Puede pagar la mitad del pedido y la otra mitad cuando llegue? (Solo en Venezuela)</summary>
+            <p class="muted">Sí, en Venezuela nos toma tiempo hacer llegar los pedidos; por lo tanto, existe esa
+              modalidad de pagar una mitad a la hora de hacer el pedido y la otra mitad cuando llegue.</p>
+          </details>
 
-        <details class="faqItem">
-          <summary>¿El envío es gratis?</summary>
-          <p class="muted">Sí, el envío es totalmente gratuito.</p>
-        </details>
+          <details class="faqItem">
+            <summary>¿Existe devoluciones o cambios?</summary>
+            <p class="muted">
+              Sí, todos los pedidos tienen sus respectivas devoluciones o cambios con una condición: el cliente tiene
+              que
+              cortar la camiseta para la devolución o cambio.
+            </p>
+          </details>
 
-        <details class="faqItem">
-          <summary>¿Cuáles son los métodos de pago?</summary>
-          <p class="muted">Se acepta Zelle, Bizum, Binance, Efectivo y pago móvil (tasa correspondiente del día).</p>
-        </details>
+          <details class="faqItem">
+            <summary>¿El envío es gratis?</summary>
+            <p class="muted">Sí, el envío es totalmente gratuito.</p>
+          </details>
 
-        <details class="faqItem">
-          <summary>¿Qué pasa si se retrasa mi pedido?</summary>
-          <p class="muted">
-            En ciertos casos ajenos a nosotros, los pedidos se pueden llegar a retrasar o incluso hasta perder. Si eso
-            sucede, no te preocupes que tu pedido tiene todo tipo de garantías.
-          </p>
-        </details>
-      </aside>
-    </div>
-  </section>
-</main>
+
+          <details class="faqItem">
+            <summary>¿Cuáles son los métodos de pago?</summary>
+            <p class="muted">Se acepta Zelle, Bizum, Binance, Efectivo y pago móvil (tasa correspondiente del día).</p>
+          </details>
+
+          <details class="faqItem">
+            <summary>¿Qué pasa si se retrasa mi pedido?</summary>
+            <p class="muted">
+              En ciertos casos ajenos a nosotros, los pedidos se pueden llegar a retrasar o incluso hasta perder. Si eso
+              sucede, no te preocupes que tu pedido tiene todo tipo de garantías.
+            </p>
+          </details>
+        </aside>
+      </div>
+    </section>
+  </main>
 
 
   <footer class="footer">
@@ -149,35 +157,35 @@
     </div>
   </footer>
 
-    <script src="js/main.js"></script>
+  <script src="js/main.js"></script>
 
-<script>
-  const WHATSAPP_NUMBER = "584246392010";
+  <script>
+    const WHATSAPP_NUMBER = "584246392010";
 
-  document.getElementById("supportForm").addEventListener("submit", (e)=>{
-    e.preventDefault();
+    document.getElementById("supportForm").addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    const name = document.getElementById("s_name").value.trim();
-    const reason = document.getElementById("s_reason").value;
-    const order = document.getElementById("s_order").value.trim();
-    const msg = document.getElementById("s_msg").value.trim();
+      const name = document.getElementById("s_name").value.trim();
+      const reason = document.getElementById("s_reason").value;
+      const order = document.getElementById("s_order").value.trim();
+      const msg = document.getElementById("s_msg").value.trim();
 
-    const lines = [
-      "Hola Ultimate Kits 👋",
-      "Necesito ayuda:",
-      "",
-      `• Nombre: ${name}`,
-      `• Motivo: ${reason}`,
-      order ? `• N° Pedido: ${order}` : null,
-      "",
-      "Mensaje:",
-      msg
-    ].filter(Boolean);
+      const lines = [
+        "Hola Ultimate Kits 👋",
+        "Necesito ayuda:",
+        "",
+        `• Nombre: ${name}`,
+        `• Motivo: ${reason}`,
+        order ? `• N° Pedido: ${order}` : null,
+        "",
+        "Mensaje:",
+        msg
+      ].filter(Boolean);
 
-    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
-  });
+      window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+    });
 
-</script>
+  </script>
 
 </body>
 
