@@ -22,12 +22,13 @@
       <span></span><span></span><span></span>
     </button>
 
- <nav class="nav" id="navMenu">
-  <a href="catalogo-f1.html"">F1</a>
-  <a href="catalogo-futbol.html">Camisetas</a>
-  <a href="sobre.html">Sobre Nosotros</a>
-  <a href="atencion.html">Atención al cliente</a>
-</nav>
+    <!-- ✅ NAV ARREGLADO (tenías comillas rotas y espacios) -->
+    <nav class="nav" id="navMenu">
+      <a href="catalogo-f1.html">F1</a>
+      <a href="catalogo-futbol.html" class="active">Camisetas</a>
+      <a href="sobre.html">Sobre Nosotros</a>
+      <a href="atencion.html">Atención al cliente</a>
+    </nav>
 
     <div class="navOverlay" id="navOverlay" hidden></div>
   </header>
@@ -39,28 +40,21 @@
         <p class="lead">Elige la camiseta que quieras, nosotros hacemos el resto</p>
       </div>
 
-      <!-- Buscador + limpiar -->
       <div class="catalogTools">
         <input id="q" class="catalogSearchInput" type="search"
-               placeholder="Buscar: Athletic, Local 24/25, Visitante..."
-               autocomplete="off">
+          placeholder="Buscar: Athletic, Local 24/25, Visitante..." autocomplete="off">
         <button class="btn btnGhost" id="clearBtn" type="button">Limpiar</button>
       </div>
 
-      <!-- Filtros -->
       <div class="filterBar">
         <div class="filterRow">
-
-          <!-- Tabs (separación real por páginas) -->
           <div class="chips">
             <a class="chip isOn" href="catalogo-futbol.html">Fútbol</a>
             <a class="chip" href="catalogo-f1.html">F1</a>
           </div>
 
-          <!-- Ediciones (solo fútbol) -->
           <div class="chips" id="editionChips"></div>
 
-          <!-- Selects -->
           <div class="selects">
             <label class="selectWrap">
               <span class="selectLabel">Club</span>
@@ -82,11 +76,9 @@
         <div class="activeFilters" id="activeFilters"></div>
       </div>
 
-      <!-- Grid -->
       <section class="productsGrid" id="grid"></section>
       <p class="muted" id="empty" hidden>No hay resultados con esos filtros.</p>
 
-      <!-- Carrito flotante -->
       <div id="cartBar" style="position:sticky;bottom:0;z-index:20;margin-top:14px;display:none;">
         <div style="background:#0f0f10;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
           <div>
@@ -100,7 +92,6 @@
         </div>
       </div>
 
-      <!-- Cargar más -->
       <div class="loadMoreWrap" style="display:flex;justify-content:center;margin:22px 0 6px;">
         <button id="loadMoreBtn" class="btn btnGhost" type="button">Cargar más</button>
       </div>
@@ -117,64 +108,77 @@
       <div class="footerLinks">
         <a href="catalogo-futbol.html">Catálogo</a>
         <a href="catalogo-f1.html">F1</a>
-       <a href="atencion.html">Atención al cliente</a>
+        <a href="atencion.html">Atención al cliente</a>
         <a href="sobre.html">Sobre nosotros</a>
       </div>
 
-      <div class="muted">
-        © <span id="year"></span> Ultimate Kits
-      </div>
+      <div class="muted">© <span id="year"></span> Ultimate Kits</div>
     </div>
   </footer>
 
-  <!-- MODAL PEDIDO -->
+  <!-- =========================
+       ✅ MODAL PEDIDO (ARREGLADO)
+  ========================== -->
   <div class="modal" id="orderModal" hidden>
     <div class="modalCard">
-      <div class="modalHead" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.10);">
+      <div class="modalTop">
         <strong>Pedido</strong>
-        <button class="iconBtn" id="closeModal" type="button" aria-label="Cerrar"
-                style="width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:20px;">✕</button>
+        <button class="modalClose" id="closeModal" type="button" aria-label="Cerrar">✕</button>
       </div>
 
-      <div style="padding:14px 16px;">
-        <p class="muted" id="productSummary" style="margin:6px 0 12px;"></p>
-
+      <div class="modalBody">
+        <!-- ✅ FORM QUE TE FALTABA -->
         <form id="orderForm" class="form">
-          <label class="field">
-            <span>Nombre en la camiseta</span>
-            <input id="shirtName" type="text" placeholder="Ej: RONALDO" maxlength="16">
-          </label>
 
-          <label class="field">
-            <span>Número</span>
-            <input id="shirtNumber" type="text" placeholder="Ej: 7" maxlength="3">
-          </label>
+          <div class="orderGrid">
+            <label class="field">
+              <span>Nombre en la camiseta</span>
+              <input id="shirtName" type="text" placeholder="Ej: RONALDO" maxlength="16">
+            </label>
 
-          <label class="field">
-            <span>Talla</span>
-            <select id="shirtSize">
-              <option value="">Selecciona talla</option>
-              <option>XS</option><option>S</option><option>M</option><option>L</option>
-              <option>XL</option><option>2XL</option>
-            </select>
-          </label>
+            <label class="field">
+              <span>Número</span>
+              <input id="shirtNumber" type="text" placeholder="Ej: 7" maxlength="3">
+            </label>
 
-          <label class="field">
-            <span>Parches (opcional)</span>
-            <input id="patches" type="text" placeholder="Ej: Champions, LaLiga, UCL...">
-          </label>
+            <label class="field">
+              <span>Talla</span>
+              <select id="shirtSize">
+                <option value="">Selecciona talla</option>
+                <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option>
+              </select>
+            </label>
 
-          <label class="field">
-            <span>Notas (opcional)</span>
-            <textarea id="notes" rows="3" placeholder="Ej: versión player / manga larga / etc."></textarea>
-          </label>
+            <label class="field">
+              <span>Parches (opcional)</span>
+              <input id="patches" type="text" placeholder="Ej: Champions, LaLiga, UCL...">
+            </label>
 
-          <div class="formActions" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+            <label class="field orderFull">
+              <span>Notas (opcional)</span>
+              <textarea id="notes" rows="3" placeholder="Ej: versión player / etc."></textarea>
+            </label>
+
+            <!-- ✅ MANGA LARGA IGUAL QUE CARRITO -->
+            <label class="field orderFull longSleeveField">
+              <span>Manga larga</span>
+              <div class="longSleeveBox">
+                <div class="longSleeveLeft">
+                  <div class="longSleeveTitle">Manga larga</div>
+                  <div class="longSleeveSub">+$5</div>
+                </div>
+                <input id="longSleeve" type="checkbox">
+              </div>
+            </label>
+          </div>
+
+          <div class="formActions">
             <button class="btn btnGhost" type="button" id="cancelOrder">Cancelar</button>
+            <!-- ✅ submit real -->
             <button class="btn" type="submit">Enviar a WhatsApp</button>
           </div>
 
-          <p class="muted" style="margin-top:10px;font-size:.9rem;">
+          <p class="muted small" style="margin-top:10px;">
             Se abrirá WhatsApp con el mensaje ya preparado.
           </p>
         </form>
@@ -185,13 +189,12 @@
   <!-- MODAL CARRITO -->
   <div class="modal" id="cartModal" hidden>
     <div class="modalCard" style="max-width:760px;">
-      <div class="modalHead" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.10);">
+      <div class="modalTop">
         <strong>Tu carrito</strong>
-        <button class="iconBtn" id="closeCart" type="button" aria-label="Cerrar"
-                style="width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:20px;">✕</button>
+        <button class="modalClose" id="closeCart" type="button" aria-label="Cerrar">✕</button>
       </div>
 
-      <div style="padding:14px 16px;">
+      <div class="modalBody">
         <div id="cartList" style="display:grid;gap:10px;margin-top:10px;"></div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
@@ -204,63 +207,38 @@
       </div>
     </div>
   </div>
-  <!-- ===== Modal: datos de envío antes de WhatsApp ===== -->
-<!-- MODAL CHECKOUT (datos envío antes de WhatsApp) -->
-<div class="modal" id="checkoutModal" hidden>
-  <div class="modalCard" style="max-width:760px;">
-    <div class="modalTop">
-      <strong>Datos para el envío</strong>
-      <button class="modalClose" type="button" data-close="1" aria-label="Cerrar">✕</button>
-    </div>
 
-    <div class="modalBody">
-      <form id="checkoutForm" class="form">
-        <label>
-          Nombre
-          <input name="nombre" type="text" required>
-        </label>
+  <!-- MODAL CHECKOUT -->
+  <div class="modal" id="checkoutModal" hidden>
+    <div class="modalCard" style="max-width:760px;">
+      <div class="modalTop">
+        <strong>Datos para el envío</strong>
+        <button class="modalClose" type="button" data-close="1" aria-label="Cerrar">✕</button>
+      </div>
 
-        <label>
-          Teléfono
-          <input name="telefono" type="tel" required>
-        </label>
+      <div class="modalBody">
+        <form id="checkoutForm" class="form">
+          <label>Nombre <input name="nombre" type="text" required></label>
+          <label>Teléfono <input name="telefono" type="tel" required></label>
+          <label>Dirección <input name="direccion" type="text" required></label>
+          <label>Código postal <input name="postal" type="text" required></label>
+          <label>Ciudad <input name="ciudad" type="text" required></label>
+          <label>País <input name="pais" type="text" required></label>
 
-        <label>
-          Dirección
-          <input name="direccion" type="text" required>
-        </label>
+          <div class="formActions">
+            <button type="button" class="btn btnGhost" data-close="1">Cancelar</button>
+            <button type="submit" class="btn">Abrir WhatsApp</button>
+          </div>
 
-        <label>
-          Código postal
-          <input name="postal" type="text" required>
-        </label>
-
-        <label>
-          Ciudad
-          <input name="ciudad" type="text" required>
-        </label>
-
-        <label>
-          País
-          <input name="pais" type="text" required>
-        </label>
-
-        <div class="formActions">
-          <button type="button" class="btn btnGhost" data-close="1">Cancelar</button>
-          <button type="submit" class="btn">Abrir WhatsApp</button>
-        </div>
-
-        <p class="muted" style="margin-top:10px;font-size:.9rem;">
-          Se abrirá WhatsApp con el pedido y tus datos de envío.
-        </p>
-      </form>
+          <p class="muted small" style="margin-top:10px;">
+            Se abrirá WhatsApp con el pedido y tus datos de envío.
+          </p>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-
 
   <script src="js/main.js"></script>
   <script src="js/catalogo.js"></script>
 </body>
 </html>
-

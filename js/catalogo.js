@@ -19,6 +19,21 @@ function money(n) {
 }
 
 // ==============================
+// ✅ Manga larga (+$5)
+// ==============================
+const LONG_SLEEVE_EXTRA = 5;
+
+function getFinalPrice(item) {
+  const base = Number(item?.precio || 0);
+  const extra = item?.isLongSleeve ? LONG_SLEEVE_EXTRA : 0;
+  return base + extra;
+}
+
+function formatLongSleeve(v) {
+  return v ? "Sí (+$5)" : "No";
+}
+
+// ==============================
 // JSONP helper
 // ==============================
 function loadJSONP(url) {
@@ -40,7 +55,7 @@ function loadJSONP(url) {
     document.body.appendChild(s);
 
     function cleanup() {
-      try { delete window[cbName]; } catch (e) {}
+      try { delete window[cbName]; } catch (e) { }
       if (s && s.parentNode) s.parentNode.removeChild(s);
     }
   });
@@ -50,9 +65,9 @@ function loadJSONP(url) {
 // Utils
 // ==============================
 function norm(s) { return (s || "").toString().toLowerCase().trim(); }
-function unique(arr) { return [...new Set((arr || []).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es")); }
+function unique(arr) { return [...new Set((arr || []).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")); }
 
-function setOptions(select, values, placeholder="Todos") {
+function setOptions(select, values, placeholder = "Todos") {
   if (!select) return;
   select.innerHTML = "";
 
@@ -73,15 +88,14 @@ function priceLabelUSD(p) {
   const n = Number(p);
   if (n === 25) return "$25 (Fan)";
   if (n === 30) return "$30 (Edición especial)";
-  if (n === 35) return "$35 (Retro/Player)";
+  if (n === 35) return "$35 (Polos/Retro/Player)";
   if (n === 40) return "$40 (Chaquetas F1)";
   return money(n);
 }
 
 function makeOrderId() {
-  // UK-<year><month><day>-<random>-<time36>
   const d = new Date();
-  const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
   return "UK-" + ymd + "-" + Math.random().toString(36).slice(2, 7).toUpperCase() + "-" + Date.now().toString(36).toUpperCase();
 }
 
@@ -105,14 +119,17 @@ const clubSel = document.getElementById("club");
 const tipoSel = document.getElementById("tipo");
 const precioSel = document.getElementById("precio");
 
-// Modal pedido individual (ya existe en tu HTML)
+// Modal pedido individual
 const orderModal = document.getElementById("orderModal");
 const closeModalBtn = document.getElementById("closeModal");
 const cancelOrderBtn = document.getElementById("cancelOrder");
 const productSummary = document.getElementById("productSummary");
 const orderForm = document.getElementById("orderForm");
 
-// Carrito + modal carrito (ya existe en tu HTML)
+// ✅ checkbox Manga larga en pedido individual (HTML debe tenerlo)
+const longSleeveEl = document.getElementById("longSleeve");
+
+// Carrito + modal carrito
 const cartBar = document.getElementById("cartBar");
 const cartCountEl = document.getElementById("cartCount");
 const cartOpenBtn = document.getElementById("cartOpenBtn");
@@ -125,7 +142,7 @@ const cartTotalEl = document.getElementById("cartTotal");
 const cartClearBtn = document.getElementById("cartClearBtn");
 const cartSendBtn2 = document.getElementById("cartSendBtn2");
 
-// Checkout modal (datos envío) -> lo vamos a usar con .modal/.modalCard
+// Checkout modal
 const checkoutModal = document.getElementById("checkoutModal");
 const checkoutForm = document.getElementById("checkoutForm");
 
@@ -189,7 +206,7 @@ function cardHTML(it) {
         <p class="muted">${metaLine}</p>
 
         <div class="productBottom">
-          <span class="price">${money(it.precio)}</span>
+          <span class="price">${money(getFinalPrice(it))}</span>
           <div style="display:flex; gap:10px;">
             <a class="miniBtn js-order" href="#" data-id="${it.id}">Pedir</a>
             <a class="miniBtn js-add" href="#" data-id="${it.id}">Añadir</a>
@@ -247,7 +264,6 @@ function buildParams() {
     params.set("club", state.f1Team);
     params.set("edicion", "all");
   } else {
-    // Fútbol: no forzamos liga porque tu API no soporta NOT
     params.set("liga", "all");
     params.set("club", state.club);
     params.set("edicion", state.edicion);
@@ -277,7 +293,6 @@ async function fetchPage(reset = false) {
 
     const params = buildParams();
 
-    // ✅ intentos para “saltar” páginas que sean solo F1 cuando estás en fútbol
     let guard = 0;
     let rawItems = [];
     let safeItems = [];
@@ -290,27 +305,22 @@ async function fetchPage(reset = false) {
 
       rawItems = (data && data.items) ? data.items : [];
 
-      // si la API ya no devuelve nada, se acabó
       if (rawItems.length === 0) {
         safeItems = [];
         break;
       }
 
-      // aplicar filtro anti-F1 SOLO en fútbol
       safeItems = (state.mode === "football") ? filterOutF1(rawItems) : rawItems;
 
-      // ✅ si estamos en fútbol y esta página quedó vacía porque era solo F1 → saltar a la siguiente
       if (state.mode === "football" && safeItems.length === 0) {
         page += 1;
         guard += 1;
         continue;
       }
 
-      // si ya hay items válidos, salimos
       break;
     }
 
-    // acumulamos
     allItems = allItems.concat(safeItems);
 
     if (grid) grid.innerHTML = allItems.map(cardHTML).join("");
@@ -318,10 +328,8 @@ async function fetchPage(reset = false) {
 
     renderActive();
 
-    // ✅ el botón depende de la API (rawItems), NO de safeItems
     if (loadMoreBtn) loadMoreBtn.hidden = (rawItems.length === 0);
 
-    // siguiente página
     page += 1;
 
   } catch (err) {
@@ -331,7 +339,6 @@ async function fetchPage(reset = false) {
     loading = false;
   }
 }
-
 
 // ==============================
 // Carrito
@@ -379,21 +386,35 @@ function cartItemHTML(item, idx) {
             <span>Talla</span>
             <select data-cart="size" data-idx="${idx}">
               <option value="">Selecciona talla</option>
-              ${["XS","S","M","L","XL","2XL"].map(s => `<option value="${s}" ${item.size === s ? "selected" : ""}>${s}</option>`).join("")}
+              ${["XS", "S", "M", "L", "XL", "2XL"].map(s => `<option value="${s}" ${item.size === s ? "selected" : ""}>${s}</option>`).join("")}
             </select>
           </label>
           <label class="field" style="margin:0;">
             <span>Parches</span>
             <input data-cart="patches" data-idx="${idx}" type="text" value="${item.patches || ""}">
           </label>
+    
           <label class="field" style="grid-column:1 / -1;margin:0;">
             <span>Notas</span>
             <input data-cart="notes" data-idx="${idx}" type="text" value="${item.notes || ""}">
           </label>
         </div>
 
+        <label class="longSleeveField" style="margin:0;">
+  <span>Manga larga</span>
+  <div class="longSleeveBox">
+    <div class="longSleeveLeft">
+      <div class="longSleeveTitle">Manga larga</div>
+      <div class="longSleeveSub">+$${LONG_SLEEVE_EXTRA}</div>
+    </div>
+    <input data-cart="longSleeve" data-idx="${idx}" type="checkbox" ${item.isLongSleeve ? "checked" : ""}>
+  </div>
+</label>
+
+
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-          <span class="muted">${money(item.precio)}</span>
+         <span class="muted">${money(getFinalPrice(item))}</span>
+
           <button class="btn btnGhost" type="button" data-cart="remove" data-idx="${idx}">Quitar</button>
         </div>
       </div>
@@ -412,7 +433,7 @@ function renderCart() {
   }
 
   cartList.innerHTML = cart.map(cartItemHTML).join("");
-  const t = cart.reduce((sum, x) => sum + Number(x.precio || 0), 0);
+  const t = cart.reduce((sum, x) => sum + getFinalPrice(x), 0);
   cartTotalEl.textContent = `Total estimado: ${money(t)}`;
   updateCartBar();
 }
@@ -459,18 +480,27 @@ document.addEventListener("input", (e) => {
   saveCart();
 });
 
+// Change: talla + manga larga
 document.addEventListener("change", (e) => {
   const el = e.target;
   if (!el || !el.dataset) return;
 
   const key = el.dataset.cart;
-  if (key !== "size") return;
-
   const idx = Number(el.dataset.idx);
   if (!Number.isFinite(idx) || !cart[idx]) return;
 
-  cart[idx].size = el.value;
-  saveCart();
+  if (key === "size") {
+    cart[idx].size = el.value;
+    saveCart();
+    return;
+  }
+
+  if (key === "longSleeve") {
+    cart[idx].isLongSleeve = !!el.checked;
+    saveCart();
+    renderCart(); // refresca total
+    return;
+  }
 });
 
 document.addEventListener("click", (e) => {
@@ -493,15 +523,42 @@ let selectedProduct = null;
 function openOrderModal(product) {
   selectedProduct = product;
 
-  if (productSummary) {
-    const line = [product.edicion || "", product.club || "", product.tipo || "", money(product.precio)]
-      .filter(Boolean).join(" · ");
-    productSummary.textContent = line;
-  }
-
   if (orderModal) orderModal.hidden = false;
   document.body.style.overflow = "hidden";
   if (orderForm) orderForm.reset();
+
+  // ✅ reset checkbox manga larga
+  if (longSleeveEl) longSleeveEl.checked = false;
+
+  if (productSummary) {
+    const line = [
+      product.edicion || "",
+      product.club || "",
+      product.tipo || "",
+      money(Number(product.precio || 0))
+    ].filter(Boolean).join(" · ");
+
+    productSummary.textContent = line;
+  }
+  // ✅ actualizar resumen en vivo cuando cambias manga larga
+const updateSummary = () => {
+  const isLong = !!document.getElementById("longSleeve")?.checked;
+  const finalPrice = Number(product.precio || 0) + (isLong ? LONG_SLEEVE_EXTRA : 0);
+
+  if (productSummary) {
+    const line = [
+      product.edicion || "",
+      money(finalPrice)
+    ].filter(Boolean).join(" · ");
+    productSummary.textContent = line;
+  }
+};
+
+// set inicial y listener
+updateSummary();
+const ls = document.getElementById("longSleeve");
+if (ls) ls.onchange = updateSummary;
+
 }
 
 function closeOrderModal() {
@@ -528,7 +585,7 @@ document.addEventListener("click", (e) => {
   if (!product) return;
 
   if (addBtn) {
-    cart.push({ ...product, customName:"", customNumber:"", size:"", patches:"", notes:"" });
+    cart.push({ ...product, customName: "", customNumber: "", size: "", patches: "", notes: "", isLongSleeve: false });
     saveCart();
     updateCartBar();
     return;
@@ -549,7 +606,13 @@ if (orderForm) {
     const patches = (document.getElementById("patches")?.value || "").trim();
     const notes = (document.getElementById("notes")?.value || "").trim();
 
+    // ✅ manga larga
+    const isLongSleeve = !!document.getElementById("longSleeve")?.checked;
+
     const orderId = makeOrderId();
+
+    // ✅ precio final en pedido individual
+    const finalPrice = Number(selectedProduct.precio || 0) + (isLongSleeve ? LONG_SLEEVE_EXTRA : 0);
 
     const lines = [
       "Hola Ultimate Kits 👋",
@@ -562,12 +625,13 @@ if (orderForm) {
       selectedProduct.liga ? `• Categoría: ${selectedProduct.liga}` : null,
       selectedProduct.tipo ? `• Tipo: ${selectedProduct.tipo}` : null,
       selectedProduct.edicion ? `• Edición: ${selectedProduct.edicion}` : null,
+      `• Manga larga: ${formatLongSleeve(isLongSleeve)}`,
       shirtSize ? `• Talla: ${shirtSize}` : "• Talla: (sin talla)",
       shirtName ? `• Nombre camiseta: ${shirtName}` : "• Nombre camiseta: (sin nombre)",
       shirtNumber ? `• Número: ${shirtNumber}` : "• Número: (sin número)",
       patches ? `• Parches: ${patches}` : null,
       `• Foto: ${selectedProduct.img}`,
-      `• Precio: ${money(selectedProduct.precio)}`,
+      `• Precio: ${money(finalPrice)}`,
       notes ? `• Notas: ${notes}` : null,
       "",
       "Gracias!"
@@ -593,7 +657,6 @@ function closeCheckout() {
   document.body.style.overflow = "";
 }
 
-// cerrar checkout con backdrop o botones data-close
 if (checkoutModal) {
   checkoutModal.addEventListener("click", (e) => {
     const closeBtn = e.target.closest("[data-close='1']");
@@ -601,7 +664,6 @@ if (checkoutModal) {
   });
 }
 
-// Botones enviar carrito -> abre checkout
 function startCartCheckout() {
   if (!cart.length) return;
   closeCart();
@@ -625,14 +687,13 @@ if (checkoutForm) {
     const pais = String(fd.get("pais") || "").trim();
     const telefono = String(fd.get("telefono") || "").trim();
 
-    // Validación simple
     if (!nombre || !direccion || !postal || !ciudad || !pais || !telefono) {
       alert("Por favor rellena todos los campos del envío.");
       return;
     }
 
     const orderId = makeOrderId();
-    const totalAmount = cart.reduce((sum, p) => sum + Number(p.precio || 0), 0);
+    const totalAmount = cart.reduce((sum, p) => sum + getFinalPrice(p), 0);
 
     const blocks = cart.map((p, i) => {
       const lines = [
@@ -643,13 +704,14 @@ if (checkoutForm) {
         p.tipo ? `• Tipo: ${p.tipo}` : null,
         p.edicion ? `• Edición: ${p.edicion}` : null,
         p.temporada ? `• Temporada: ${p.temporada}` : null,
+        `• Manga larga: ${formatLongSleeve(!!p.isLongSleeve)}`,
         p.size ? `• Talla: ${p.size}` : `• Talla: (sin talla)`,
         p.customName ? `• Nombre: ${p.customName}` : `• Nombre: (sin nombre)`,
         p.customNumber ? `• Número: ${p.customNumber}` : `• Número: (sin número)`,
         p.patches ? `• Parches: ${p.patches}` : null,
         p.notes ? `• Notas: ${p.notes}` : null,
         `• Foto: ${p.img}`,
-        `• Precio: ${money(p.precio)}`
+        `• Precio: ${money(getFinalPrice(p))}`
       ].filter(Boolean);
 
       return lines.join("\n");
@@ -739,11 +801,9 @@ async function init() {
   updateCartBar();
   renderEditionChips();
 
-  // 1) meta
   const metaData = await loadJSONP(API_URL + "?mode=meta");
   const meta = metaData && metaData.meta ? metaData.meta : { clubs: [], tipos: [], precios: [], f1Teams: [] };
 
-  // selects comunes
   setOptions(tipoSel, meta.tipos || [], "Todos");
 
   if (precioSel) {
@@ -752,12 +812,10 @@ async function init() {
       (meta.precios || []).map(v => `<option value="${v}">${priceLabelUSD(Number(v))}</option>`).join("");
   }
 
-  // fútbol: clubs
   if (state.mode === "football") {
     setOptions(clubSel, meta.clubs || [], "Todos");
   }
 
-  // 2) primera página
   await fetchPage(true);
 }
 
