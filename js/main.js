@@ -1,14 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // =========================
   // Year
-  // =========================
   document.querySelectorAll("#year").forEach(el => {
     el.textContent = new Date().getFullYear();
   });
 
-  // =========================
   // Reveal on scroll
-  // =========================
   const revealEls = document.querySelectorAll(".reveal");
   if (revealEls.length) {
     const io = new IntersectionObserver(
@@ -22,21 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       { threshold: 0.14 }
     );
-
     revealEls.forEach(el => io.observe(el));
   }
 
-  // =========================
-  // Burger menu (mobile)
-  // Requiere:
-  //  - #burgerBtn
-  //  - #navMenu
-  //  - #navOverlay
-  // =========================
+  // Burger menu
   const burgerBtn = document.getElementById("burgerBtn");
   const navMenu = document.getElementById("navMenu");
   const navOverlay = document.getElementById("navOverlay");
-
   const hasBurger = burgerBtn && navMenu && navOverlay;
 
   function openMenu() {
@@ -61,28 +49,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (hasBurger) {
     burgerBtn.addEventListener("click", () => {
-      const isOpen = navMenu.classList.contains("isOpen");
-      isOpen ? closeMenu() : openMenu();
+      navMenu.classList.contains("isOpen") ? closeMenu() : openMenu();
     });
-
     navOverlay.addEventListener("click", closeMenu);
-
     navMenu.addEventListener("click", (e) => {
       if (e.target.closest("a")) closeMenu();
     });
-
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeMenu();
     });
-
     window.addEventListener("resize", () => {
       if (window.innerWidth > 860) closeMenu();
     });
   }
 
-  // =========================
-  // Active link (nav)
-  // =========================
+  // Active link
   const current = location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".nav a").forEach(link => {
     if (link.getAttribute("href") === current) {
@@ -92,4 +73,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-

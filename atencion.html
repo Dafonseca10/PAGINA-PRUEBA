@@ -1,35 +1,35 @@
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Atención al cliente — Ultimate Kits</title>
+  <meta name="description" content="¿Tienes dudas? Contacta con Ultimate Kits por WhatsApp. FAQ, envíos, cambios y más." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="shortcut icon" href="/assets/CIRCULAR BLANCO (1).png" type="image/x-icon">
+  <link rel="icon" href="assets/CIRCULAR BLANCO (1).png" type="image/png" />
 </head>
 
 <body>
   <div class="topbar">
-    <p>Envío gratis · Envios a todo el mundo · Soporte 24/7</p>
+    <p>Envío gratis · Envíos a todo el mundo · Soporte 24/7</p>
   </div>
 
   <header class="header">
     <a class="logo" href="index.html" aria-label="Ultimate Kits">
-      <img class="logoImg" src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" />
+      <img class="logoImg" src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" width="180" height="52" />
     </a>
-
     <button class="burger" id="burgerBtn" type="button" aria-label="Abrir menú" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-
     <nav class="nav" id="navMenu">
-      <a href="catalogo-f1.html"">F1</a>
-  <a href=" catalogo-futbol.html">Camisetas</a>
+      <a href="catalogo-f1.html">F1</a>
+      <a href="catalogo-futbol.html">Camisetas</a>
       <a href="sobre.html">Sobre Nosotros</a>
       <a href="atencion.html">Atención al cliente</a>
     </nav>
-
     <div class="navOverlay" id="navOverlay" hidden></div>
   </header>
 
@@ -41,15 +41,13 @@
       </header>
 
       <div class="supportLayout">
-        <!-- FORM -->
         <section class="supportCard">
           <form id="supportForm" class="supportForm">
             <div class="formGrid">
               <label class="field">
                 <span>Tu nombre</span>
-                <input id="s_name" type="text" placeholder="Ej: Juan" required>
+                <input id="s_name" type="text" placeholder="Ej: Juan" required />
               </label>
-
               <label class="field">
                 <span>Motivo</span>
                 <select id="s_reason" required>
@@ -60,16 +58,13 @@
                   <option value="Otro">Otro</option>
                 </select>
               </label>
-
               <label class="field formFull">
                 <span>N° de pedido (opcional)</span>
-                <input id="s_order" type="text" placeholder="Ej: 123123">
+                <input id="s_order" type="text" placeholder="Ej: 123123" />
               </label>
-
               <label class="field formFull">
                 <span>Mensaje</span>
-                <textarea id="s_msg" rows="6" placeholder="Explícanos tu caso con el máximo detalle..."
-                  required></textarea>
+                <textarea id="s_msg" rows="6" placeholder="Explícanos tu caso con el máximo detalle..." required></textarea>
               </label>
             </div>
 
@@ -86,7 +81,6 @@
           </form>
         </section>
 
-        <!-- FAQ -->
         <aside class="faqCard">
           <h2>Preguntas frecuentes</h2>
 
@@ -99,17 +93,16 @@
           </details>
 
           <details class="faqItem">
-            <summary>¿Puede pagar la mitad del pedido y la otra mitad cuando llegue? (Solo en Venezuela)</summary>
+            <summary>¿Puedo pagar la mitad del pedido y la otra mitad cuando llegue? (Solo en Venezuela)</summary>
             <p class="muted">Sí, en Venezuela nos toma tiempo hacer llegar los pedidos; por lo tanto, existe esa
               modalidad de pagar una mitad a la hora de hacer el pedido y la otra mitad cuando llegue.</p>
           </details>
 
           <details class="faqItem">
-            <summary>¿Existe devoluciones o cambios?</summary>
+            <summary>¿Existen devoluciones o cambios?</summary>
             <p class="muted">
               Sí, todos los pedidos tienen sus respectivas devoluciones o cambios con una condición: el cliente tiene
-              que
-              cortar la camiseta para la devolución o cambio.
+              que cortar la camiseta para la devolución o cambio.
             </p>
           </details>
 
@@ -117,7 +110,6 @@
             <summary>¿El envío es gratis?</summary>
             <p class="muted">Sí, el envío es totalmente gratuito.</p>
           </details>
-
 
           <details class="faqItem">
             <summary>¿Cuáles son los métodos de pago?</summary>
@@ -136,35 +128,27 @@
     </section>
   </main>
 
-
   <footer class="footer">
     <div class="container footerGrid">
       <div>
         <strong>Ultimate Kits</strong>
         <p class="muted">Camisetas & moda de fútbol y F1.</p>
       </div>
-
       <div class="footerLinks">
         <a href="catalogo-futbol.html">Catálogo</a>
         <a href="catalogo-f1.html">F1</a>
         <a href="atencion.html">Atención al cliente</a>
         <a href="sobre.html">Sobre nosotros</a>
       </div>
-
-      <div class="muted">
-        © <span id="year"></span> Ultimate Kits
-      </div>
+      <div class="muted">© <span id="year"></span> Ultimate Kits</div>
     </div>
   </footer>
 
   <script src="js/main.js"></script>
-
   <script>
     const WHATSAPP_NUMBER = "584246392010";
-
     document.getElementById("supportForm").addEventListener("submit", (e) => {
       e.preventDefault();
-
       const name = document.getElementById("s_name").value.trim();
       const reason = document.getElementById("s_reason").value;
       const order = document.getElementById("s_order").value.trim();
@@ -182,11 +166,10 @@
         msg
       ].filter(Boolean);
 
-      window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+      const w = window.open(url, "_blank");
+      if (!w) window.location.href = url;
     });
-
   </script>
-
 </body>
-
 </html>

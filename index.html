@@ -4,80 +4,89 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Ultimate Kits — Camisetas & Moda de Fútbol y F1</title>
-  <meta name="description" content="Ultimate Kits: catálogo de camisetas y ropa. Envíos rápidos y atención al cliente." />
+  <meta name="description" content="Ultimate Kits: catálogo de camisetas y ropa de fútbol y F1. Envíos rápidos y atención al cliente." />
+
+  <!-- OG Tags -->
+  <meta property="og:title" content="Ultimate Kits — Camisetas & Moda de Fútbol y F1" />
+  <meta property="og:description" content="Camisetas y ropa seleccionada de fútbol y F1. Drops semanales y atención rápida." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/LOGOTIPO EN BLANCO (6).png" />
+
+  <!-- Preconnect para velocidad -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://script.google.com" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet" />
+
+  <!-- Preload critical assets -->
+  <link rel="preload" href="assets/the-stadium.jpg" as="image" />
+
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="shortcut icon" href="/assets/CIRCULAR BLANCO (1).png" type="image/x-icon">
+  <link rel="icon" href="assets/CIRCULAR BLANCO (1).png" type="image/png" />
 </head>
 
 <body>
-  <!-- Top notice (tipo LAB46) -->
+  <!-- Top notice -->
   <div class="topbar">
-    <p>Envío gratis · Envios a todo el mundo · Soporte 24/7</p>
+    <p>Envío gratis · Envíos a todo el mundo · Soporte 24/7</p>
   </div>
 
   <header class="header">
-  <a class="logo" href="index.html" aria-label="Ultimate Kits">
-  <img class="logoImg"  src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" />
-</a>
+    <a class="logo" href="index.html" aria-label="Ultimate Kits">
+      <img class="logoImg" src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" width="180" height="52" />
+    </a>
 
+    <button class="burger" id="burgerBtn" type="button" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-<button class="burger" id="burgerBtn" type="button"
-  aria-label="Abrir menú" aria-expanded="false">
-  <span></span><span></span><span></span>
-</button>
-
-<nav class="nav" id="navMenu">
-  <a href="catalogo-f1.html"">F1</a>
-  <a href="catalogo-futbol.html">Camisetas</a>
-  <a href="sobre.html">Sobre Nosotros</a>
-  <a href="atencion.html">Atención al cliente</a>
-</nav>
-<div class="navOverlay" id="navOverlay" hidden></div>
-
-</header>
-
-
+    <nav class="nav" id="navMenu">
+      <a href="catalogo-f1.html">F1</a>
+      <a href="catalogo-futbol.html">Camisetas</a>
+      <a href="sobre.html">Sobre Nosotros</a>
+      <a href="atencion.html">Atención al cliente</a>
+    </nav>
+    <div class="navOverlay" id="navOverlay" hidden></div>
+  </header>
 
   <main>
-    <!-- HERO: tipografía grande + CTA -->
-  <section class="hero heroWithBg">
-  <!-- Fondo -->
-  <div class="heroBg"></div>
+    <!-- HERO -->
+    <section class="hero heroWithBg">
+      <div class="heroBg"></div>
 
-  <!-- Contenido -->
-  <div class="container heroGrid">
-    <div class="heroCopy">
-      <p class="kicker">FÚTBOL · F1 · STREETWEAR</p>
-      <h1>Tu kit perfecto, listo para jugar.</h1>
-      <p class="lead">
-        Camisetas y ropa seleccionada de fútbol y F1. Drops semanales y atención rápida.
-      </p>
+      <div class="container heroGrid">
+        <div class="heroCopy">
+          <p class="kicker">Fútbol · F1 · Streetwear</p>
+          <h1>Tu kit perfecto, listo para jugar.</h1>
+          <p class="lead">
+            Camisetas y ropa seleccionada de fútbol y F1. Drops semanales y atención rápida.
+          </p>
 
-      <div class="heroActions">
-        <a class="btn" href="catalogo-futbol.html">Ver catálogo</a>
-        <a class="btn btnGhost" href="#secciones">Explorar</a>
+          <div class="heroActions">
+            <a class="btn btnPrimary" href="catalogo-futbol.html">Ver catálogo</a>
+            <a class="btn btnGhost" href="#secciones">Explorar</a>
+          </div>
+
+          <div class="trustRow">
+            <span class="pill">Pagos seguros</span>
+            <span class="pill">Envíos rápidos</span>
+            <span class="pill">Soporte real</span>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="trustRow">
-        <span class="pill">Pagos seguros</span>
-        <span class="pill">Envíos rápidos</span>
-        <span class="pill">Soporte real</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-    <!-- 3 SECCIONES (cards) que resumen la web y llevan a otras páginas -->
+    <!-- SECCIONES -->
     <section class="section" id="secciones">
       <div class="container">
         <div class="sectionHead">
           <h2>Sobre nosotros</h2>
-          <p>Quieres saber mas de nosotros? te lo dejamos a mano</p>
+          <p>¿Quieres saber más de nosotros? Te lo dejamos a mano</p>
         </div>
 
         <div class="cardsGrid">
-          <!-- 1) Catálogo -->
           <article class="card reveal">
             <a class="cardLink" href="catalogo-futbol.html" aria-label="Ir al Catálogo"></a>
             <div class="cardTop">
@@ -91,13 +100,12 @@
             <ul class="bullets">
               <li>Filtros por equipo / temporada</li>
               <li>Destacados y novedades</li>
-              <li>Compra rapida y segura</li>
+              <li>Compra rápida y segura</li>
             </ul>
             <div class="cardArrow">→</div>
             <div class="cardBg"></div>
           </article>
 
-          <!-- 2) Atención al cliente -->
           <article class="card reveal">
             <a class="cardLink" href="atencion.html" aria-label="Ir a Atención al cliente"></a>
             <div class="cardTop">
@@ -117,7 +125,6 @@
             <div class="cardBg"></div>
           </article>
 
-          <!-- 3) Sobre -->
           <article class="card reveal">
             <a class="cardLink" href="sobre.html" aria-label="Ir a Sobre Ultimate Kits"></a>
             <div class="cardTop">
@@ -140,7 +147,7 @@
       </div>
     </section>
 
-    <!-- Banda final tipo “badges” -->
+    <!-- Badges -->
     <section class="badges">
       <div class="container badgesRow">
         <div class="badge">Satisfacción incluida</div>
@@ -150,51 +157,46 @@
       </div>
     </section>
 
-    <!-- Instagram feed -->
-<!-- Instagram feed (enmarcado estilo Ultimate Kits) -->
-<section class="section igSection">
-  <div class="container">
-    <div class="igHead">
-      <div>
-        <h2>Últimas publicaciones</h2>
-        <p class="muted">
-          Síguenos en Instagram:
-          <a class="igLink" href="https://www.instagram.com/ultimatekits_90/" target="_blank" rel="noopener">
-            @ultimatekits_90
+    <!-- Instagram -->
+    <section class="section igSection">
+      <div class="container">
+        <div class="igHead">
+          <div>
+            <h2>Últimas publicaciones</h2>
+            <p class="muted">
+              Síguenos en Instagram:
+              <a class="igLink" href="https://www.instagram.com/ultimatekits_90/" target="_blank" rel="noopener">
+                @ultimatekits_90
+              </a>
+            </p>
+          </div>
+
+          <a class="btn btnGhost" href="https://www.instagram.com/ultimatekits_90/" target="_blank" rel="noopener">
+            Ver perfil →
           </a>
-        </p>
+        </div>
+
+        <div class="igFrameGrid">
+          <div class="igFrame reveal">
+            <blockquote class="instagram-media"
+              data-instgrm-permalink="https://www.instagram.com/p/DTTcG0GDXeA/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+              data-instgrm-version="14"></blockquote>
+          </div>
+
+          <div class="igFrame reveal">
+            <blockquote class="instagram-media"
+              data-instgrm-permalink="https://www.instagram.com/p/DTQkxhxjZ7h/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+              data-instgrm-version="14"></blockquote>
+          </div>
+
+          <div class="igFrame reveal">
+            <blockquote class="instagram-media"
+              data-instgrm-permalink="https://www.instagram.com/reel/DSdGffuCtIK/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+              data-instgrm-version="14"></blockquote>
+          </div>
+        </div>
       </div>
-
-      <a class="btn btnGhost" href="https://www.instagram.com/ultimatekits_90/" target="_blank" rel="noopener">
-        Ver perfil →
-      </a>
-    </div>
-
-    <div class="igFrameGrid">
-      <!-- IMPORTANTE: aquí van tus blockquotes tal cual (uno por post) -->
-      <div class="igFrame reveal">
-        <blockquote class="instagram-media"
-          data-instgrm-permalink="https://www.instagram.com/p/DTTcG0GDXeA/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
-          data-instgrm-version="14"></blockquote>
-      </div>
-
-      <div class="igFrame reveal">
-        <blockquote class="instagram-media"
-          data-instgrm-permalink="https://www.instagram.com/p/DTQkxhxjZ7h/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
-          data-instgrm-version="14"></blockquote>
-      </div>
-
-      <div class="igFrame reveal">
-        <blockquote class="instagram-media"
-          data-instgrm-permalink="https://www.instagram.com/reel/DSdGffuCtIK/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
-          data-instgrm-version="14"></blockquote>
-      </div>
-    </div>
-
-
-</section>
-
-
+    </section>
   </main>
 
   <footer class="footer">
@@ -203,23 +205,18 @@
         <strong>Ultimate Kits</strong>
         <p class="muted">Camisetas & moda de fútbol y F1.</p>
       </div>
-
       <div class="footerLinks">
-      <a href="catalogo-futbol.html">Catálogo</a>
+        <a href="catalogo-futbol.html">Catálogo</a>
         <a href="catalogo-f1.html">F1</a>
         <a href="atencion.html">Atención al cliente</a>
         <a href="sobre.html">Sobre nosotros</a>
       </div>
-
-      <div class="muted">
-        © <span id="year"></span> Ultimate Kits
-      </div>
+      <div class="muted">© <span id="year"></span> Ultimate Kits</div>
     </div>
   </footer>
 
-<script src="js/main.js"></script>
-<script async src="https://www.instagram.com/embed.js"></script>
-
-
+  <script src="js/main.js"></script>
+  <!-- Defer Instagram embed for performance -->
+  <script async defer src="https://www.instagram.com/embed.js"></script>
 </body>
 </html>

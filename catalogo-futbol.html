@@ -4,32 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Catálogo Fútbol — Ultimate Kits</title>
+  <meta name="description" content="Catálogo de camisetas de fútbol: Fan, Player, Retro y Edición Especial. Filtra por equipo, temporada y más." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://script.google.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="shortcut icon" href="assets/CIRCULAR BLANCO (1).png" type="image/x-icon">
+  <link rel="icon" href="assets/CIRCULAR BLANCO (1).png" type="image/png" />
 </head>
 
 <body data-mode="football">
   <div class="topbar">
-    <p>Envío gratis · Envios a todo el mundo · Soporte 24/7</p>
+    <p>Envío gratis · Envíos a todo el mundo · Soporte 24/7</p>
   </div>
 
   <header class="header">
     <a class="logo" href="index.html" aria-label="Ultimate Kits">
-      <img class="logoImg" src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" />
+      <img class="logoImg" src="assets/LOGOTIPO EN BLANCO (6).png" alt="Ultimate Kits" width="180" height="52" />
     </a>
-
     <button class="burger" id="burgerBtn" type="button" aria-label="Abrir menú" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-
-    <!-- ✅ NAV ARREGLADO (tenías comillas rotas y espacios) -->
     <nav class="nav" id="navMenu">
       <a href="catalogo-f1.html">F1</a>
       <a href="catalogo-futbol.html" class="active">Camisetas</a>
       <a href="sobre.html">Sobre Nosotros</a>
       <a href="atencion.html">Atención al cliente</a>
     </nav>
-
     <div class="navOverlay" id="navOverlay" hidden></div>
   </header>
 
@@ -42,7 +43,7 @@
 
       <div class="catalogTools">
         <input id="q" class="catalogSearchInput" type="search"
-          placeholder="Buscar: Athletic, Local 24/25, Visitante..." autocomplete="off">
+          placeholder="Buscar: Athletic, Local 24/25, Visitante..." autocomplete="off" />
         <button class="btn btnGhost" id="clearBtn" type="button">Limpiar</button>
       </div>
 
@@ -52,27 +53,22 @@
             <a class="chip isOn" href="catalogo-futbol.html">Fútbol</a>
             <a class="chip" href="catalogo-f1.html">F1</a>
           </div>
-
           <div class="chips" id="editionChips"></div>
-
           <div class="selects">
             <label class="selectWrap">
               <span class="selectLabel">Club</span>
               <select id="club"></select>
             </label>
-
             <label class="selectWrap">
               <span class="selectLabel">Tipo</span>
               <select id="tipo"></select>
             </label>
-
             <label class="selectWrap">
               <span class="selectLabel">Precio</span>
               <select id="precio"></select>
             </label>
           </div>
         </div>
-
         <div class="activeFilters" id="activeFilters"></div>
       </div>
 
@@ -80,19 +76,19 @@
       <p class="muted" id="empty" hidden>No hay resultados con esos filtros.</p>
 
       <div id="cartBar" style="position:sticky;bottom:0;z-index:20;margin-top:14px;display:none;">
-        <div style="background:#0f0f10;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
           <div>
             <strong>Carrito</strong>
             <span class="muted" id="cartCount" style="margin-left:8px;">0 items</span>
           </div>
           <div style="display:flex; gap:10px; align-items:center;">
             <button id="cartOpenBtn" class="btn btnGhost" type="button">Ver carrito</button>
-            <button id="cartSendBtn" class="btn" type="button">Enviar por WhatsApp</button>
+            <button id="cartSendBtn" class="btn btnPrimary" type="button">Enviar por WhatsApp</button>
           </div>
         </div>
       </div>
 
-      <div class="loadMoreWrap" style="display:flex;justify-content:center;margin:22px 0 6px;">
+      <div class="loadMoreWrap">
         <button id="loadMoreBtn" class="btn btnGhost" type="button">Cargar más</button>
       </div>
     </div>
@@ -104,43 +100,34 @@
         <strong>Ultimate Kits</strong>
         <p class="muted">Camisetas & moda de fútbol y F1.</p>
       </div>
-
       <div class="footerLinks">
         <a href="catalogo-futbol.html">Catálogo</a>
         <a href="catalogo-f1.html">F1</a>
         <a href="atencion.html">Atención al cliente</a>
         <a href="sobre.html">Sobre nosotros</a>
       </div>
-
       <div class="muted">© <span id="year"></span> Ultimate Kits</div>
     </div>
   </footer>
 
-  <!-- =========================
-       ✅ MODAL PEDIDO (ARREGLADO)
-  ========================== -->
+  <!-- MODAL PEDIDO -->
   <div class="modal" id="orderModal" hidden>
     <div class="modalCard">
       <div class="modalTop">
         <strong>Pedido</strong>
         <button class="modalClose" id="closeModal" type="button" aria-label="Cerrar">✕</button>
       </div>
-
       <div class="modalBody">
-        <!-- ✅ FORM QUE TE FALTABA -->
         <form id="orderForm" class="form">
-
           <div class="orderGrid">
             <label class="field">
               <span>Nombre en la camiseta</span>
-              <input id="shirtName" type="text" placeholder="Ej: RONALDO" maxlength="16">
+              <input id="shirtName" type="text" placeholder="Ej: RONALDO" maxlength="16" />
             </label>
-
             <label class="field">
               <span>Número</span>
-              <input id="shirtNumber" type="text" placeholder="Ej: 7" maxlength="3">
+              <input id="shirtNumber" type="text" placeholder="Ej: 7" maxlength="3" />
             </label>
-
             <label class="field">
               <span>Talla</span>
               <select id="shirtSize">
@@ -148,18 +135,14 @@
                 <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option>
               </select>
             </label>
-
             <label class="field">
               <span>Parches (opcional)</span>
-              <input id="patches" type="text" placeholder="Ej: Champions, LaLiga, UCL...">
+              <input id="patches" type="text" placeholder="Ej: Champions, LaLiga, UCL..." />
             </label>
-
             <label class="field orderFull">
               <span>Notas (opcional)</span>
               <textarea id="notes" rows="3" placeholder="Ej: versión player / etc."></textarea>
             </label>
-
-            <!-- ✅ MANGA LARGA IGUAL QUE CARRITO -->
             <label class="field orderFull longSleeveField">
               <span>Manga larga</span>
               <div class="longSleeveBox">
@@ -167,20 +150,15 @@
                   <div class="longSleeveTitle">Manga larga</div>
                   <div class="longSleeveSub">+$5</div>
                 </div>
-                <input id="longSleeve" type="checkbox">
+                <input id="longSleeve" type="checkbox" />
               </div>
             </label>
           </div>
-
           <div class="formActions">
             <button class="btn btnGhost" type="button" id="cancelOrder">Cancelar</button>
-            <!-- ✅ submit real -->
-            <button class="btn" type="submit">Enviar a WhatsApp</button>
+            <button class="btn btnPrimary" type="submit">Enviar a WhatsApp</button>
           </div>
-
-          <p class="muted small" style="margin-top:10px;">
-            Se abrirá WhatsApp con el mensaje ya preparado.
-          </p>
+          <p class="muted small" style="margin-top:10px;">Se abrirá WhatsApp con el mensaje ya preparado.</p>
         </form>
       </div>
     </div>
@@ -193,15 +171,13 @@
         <strong>Tu carrito</strong>
         <button class="modalClose" id="closeCart" type="button" aria-label="Cerrar">✕</button>
       </div>
-
       <div class="modalBody">
         <div id="cartList" style="display:grid;gap:10px;margin-top:10px;"></div>
-
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
           <div class="muted" id="cartTotal"></div>
           <div style="display:flex; gap:10px;">
             <button id="cartClearBtn" class="btn btnGhost" type="button">Vaciar</button>
-            <button id="cartSendBtn2" class="btn" type="button">Enviar por WhatsApp</button>
+            <button id="cartSendBtn2" class="btn btnPrimary" type="button">Enviar por WhatsApp</button>
           </div>
         </div>
       </div>
@@ -215,24 +191,19 @@
         <strong>Datos para el envío</strong>
         <button class="modalClose" type="button" data-close="1" aria-label="Cerrar">✕</button>
       </div>
-
       <div class="modalBody">
         <form id="checkoutForm" class="form">
-          <label>Nombre <input name="nombre" type="text" required></label>
-          <label>Teléfono <input name="telefono" type="tel" required></label>
-          <label>Dirección <input name="direccion" type="text" required></label>
-          <label>Código postal <input name="postal" type="text" required></label>
-          <label>Ciudad <input name="ciudad" type="text" required></label>
-          <label>País <input name="pais" type="text" required></label>
-
+          <label>Nombre <input name="nombre" type="text" required /></label>
+          <label>Teléfono <input name="telefono" type="tel" required /></label>
+          <label>Dirección <input name="direccion" type="text" required /></label>
+          <label>Código postal <input name="postal" type="text" required /></label>
+          <label>Ciudad <input name="ciudad" type="text" required /></label>
+          <label>País <input name="pais" type="text" required /></label>
           <div class="formActions">
             <button type="button" class="btn btnGhost" data-close="1">Cancelar</button>
-            <button type="submit" class="btn">Abrir WhatsApp</button>
+            <button type="submit" class="btn btnPrimary">Abrir WhatsApp</button>
           </div>
-
-          <p class="muted small" style="margin-top:10px;">
-            Se abrirá WhatsApp con el pedido y tus datos de envío.
-          </p>
+          <p class="muted small" style="margin-top:10px;">Se abrirá WhatsApp con el pedido y tus datos de envío.</p>
         </form>
       </div>
     </div>
