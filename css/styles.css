@@ -75,6 +75,7 @@ button { font: inherit; cursor: pointer }
 
 /* --- TOPBAR --- */
 .topbar {
+   transition: transform .3s, opacity .3s;
   border-bottom: 1px solid var(--line);
   background: rgba(255,255,255,.02);
   position: sticky; top: 0; z-index: 30;

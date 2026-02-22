@@ -73,3 +73,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// Ocultar barra de envío al hacer scroll
+const topBar = document.querySelector('.topBar');
+if (topBar) {
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 50) {
+      topBar.style.transform = 'translateY(-100%)';
+      topBar.style.opacity = '0';
+    } else {
+      topBar.style.transform = 'translateY(0)';
+      topBar.style.opacity = '1';
+    }
+  });
+}
