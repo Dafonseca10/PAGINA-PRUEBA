@@ -3,7 +3,7 @@
 // ==============================
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbzy_6IRby5dFcmD_tlN0sS0_hnBNP-azy8la61O0_CJka9Qa7bNgSQl4uWXiCUS4ey7aA/exec";
+  "https://ultimate-kits-api.ultimatekits00.workers.dev/";
 const WHATSAPP_NUMBER = "584246392010";
 const DEFAULT_LIMIT = 60;
 const CART_KEY = "uk_cart_v2";
