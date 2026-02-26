@@ -3,7 +3,7 @@
 // ==============================
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbxQ1fCIQRCBZh94mRx3tW6-L1ABz2TxBE8YOUGpDQPDoGvAQdksizP-vXAUTtIbRVVMFA/exec";
+  "https://script.google.com/macros/s/AKfycbzy_6IRby5dFcmD_tlN0sS0_hnBNP-azy8la61O0_CJka9Qa7bNgSQl4uWXiCUS4ey7aA/exec";
 const WHATSAPP_NUMBER = "584246392010";
 const DEFAULT_LIMIT = 60;
 const CART_KEY = "uk_cart_v2";
@@ -137,7 +137,7 @@ function cardHTML(it) {
   return `
     <article class="productCard">
       <div class="productImg">
-        <img src="${it.img}" alt="${it.nombre || "Producto"}" loading="lazy" />
+        <img src="${window._ukCloud ? window._ukCloud(it.img) : it.img}" alt="${it.nombre || "Producto"}" loading="lazy" />
         <span class="pFloat">${it.edicion || ""}</span>
       </div>
       <div class="productInfo">
