@@ -4,7 +4,7 @@
 
 const API_URL =
   "https://ultimate-kits-api.ultimatekits00.workers.dev/";
-const WHATSAPP_NUMBER = "584246392010";
+const WHATSAPP_NUMBER = "34648972815";
 const DEFAULT_LIMIT = 60;
 const CART_KEY = "uk_cart_v2";
 const LONG_SLEEVE_EXTRA = 5;
