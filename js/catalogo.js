@@ -1,13 +1,82 @@
 // ==============================
-// ULTIMATE KITS — CATALOGO + CARRITO + WHATSAPP
+// ULTIMATE KITS — CATALOGO + CARRITO + WHATSAPP + SUPABASE
 // ==============================
 
 const API_URL =
   "https://ultimate-kits-api.ultimatekits00.workers.dev/";
-const WHATSAPP_NUMBER = "584246392010";
+const WHATSAPP_NUMBER = "34648972815";
 const DEFAULT_LIMIT = 60;
 const CART_KEY = "uk_cart_v2";
 const LONG_SLEEVE_EXTRA = 5;
+
+// SUPABASE — auto-save pedidos al panel
+const SB_URL = "https://zjsqnhatvowjsvfwnqao.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpqc3FuaGF0dm93anN2ZnducWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MTI4MTcsImV4cCI6MjA4OTI4ODgxN30.aZ7ed4j533yCB4BEFVIDnavuy_Nt0mUqVWYO52xzczM";
+
+async function saveOrderToPanel(orderData) {
+  try {
+    // Save order
+    await fetch(SB_URL + "/rest/v1/pedidos", {
+      method: "POST",
+      headers: {
+        "apikey": SB_KEY,
+        "Authorization": "Bearer " + SB_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    // Update product sales counter
+    const prod = orderData.producto;
+    if (prod) {
+      const checkRes = await fetch(SB_URL + "/rest/v1/ventas_producto?producto=eq." + encodeURIComponent(prod), {
+        headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY }
+      });
+      const existing = await checkRes.json();
+      if (existing && existing.length > 0) {
+        await fetch(SB_URL + "/rest/v1/ventas_producto?producto=eq." + encodeURIComponent(prod), {
+          method: "PATCH",
+          headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ cantidad: existing[0].cantidad + 1 })
+        });
+      } else {
+        await fetch(SB_URL + "/rest/v1/ventas_producto", {
+          method: "POST",
+          headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ producto: prod, cantidad: 1 })
+        });
+      }
+    }
+
+    // Update or create client
+    const cliente = orderData.cliente;
+    if (cliente) {
+      const cliRes = await fetch(SB_URL + "/rest/v1/clientes?nombre=ilike." + encodeURIComponent(cliente), {
+        headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY }
+      });
+      const cliData = await cliRes.json();
+      if (cliData && cliData.length > 0) {
+        const cl = cliData[0];
+        await fetch(SB_URL + "/rest/v1/clientes?id=eq." + cl.id, {
+          method: "PATCH",
+          headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ pedidos: (cl.pedidos || 0) + 1, total_gastado: Number(cl.total_gastado || 0) + Number(orderData.precio || 0) })
+        });
+      } else {
+        await fetch(SB_URL + "/rest/v1/clientes", {
+          method: "POST",
+          headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ nombre: cliente, telefono: orderData.telefono || "", pais: "", pedidos: 1, total_gastado: Number(orderData.precio || 0) })
+        });
+      }
+    }
+
+    console.log("✅ Pedido guardado en panel:", orderData.codigo);
+  } catch (err) {
+    console.warn("⚠️ No se pudo guardar en panel (WhatsApp sí se envió):", err);
+  }
+}
 
 // HELPERS
 function money(n) { return `$${Number(n || 0)}`; }
@@ -42,8 +111,11 @@ function priceLabelUSD(p) {
 
 function makeOrderId() {
   const d = new Date();
-  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
-  return "UK-" + ymd + "-" + Math.random().toString(36).slice(2, 7).toUpperCase() + "-" + Date.now().toString(36).toUpperCase();
+  return "UK-" + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0") + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+}
+
+function makeTracking() {
+  return "TRK-" + Date.now().toString(36).toUpperCase().slice(-8);
 }
 
 function openWhatsApp(text) {
@@ -449,6 +521,25 @@ if (checkoutForm) {
     if (checkoutContext.type === "single" && checkoutContext.singleItem) {
       const p = checkoutContext.singleItem;
       const finalPrice = getFinalPrice(p);
+      const productName = [p.club, p.edicion].filter(Boolean).join(" · ");
+
+      // SAVE TO PANEL (async, no bloquea WhatsApp)
+      saveOrderToPanel({
+        codigo: orderId,
+        cliente: nombre,
+        telefono: telefono,
+        producto: productName || p.nombre,
+        liga: p.liga || "",
+        talla: p.size || "",
+        precio: finalPrice,
+        metodo: "Web",
+        destino: pais || "Internacional",
+        personalizacion: [p.customName, p.customNumber].filter(Boolean).join(" "),
+        notas: [p.patches ? "Parches: " + p.patches : "", p.notes, p.isLongSleeve ? "Manga larga" : ""].filter(Boolean).join(" | "),
+        tracking: makeTracking(),
+        estado: "Hecho"
+      });
+
       const textLines = [
         "Hola Ultimate Kits 👋", "Quiero hacer este pedido:", "",
         `OrderID: ${orderId}`, "",
@@ -477,6 +568,27 @@ if (checkoutForm) {
     if (checkoutContext.type === "cart") {
       if (!cart.length) { alert("Tu carrito está vacío."); return; }
       const totalAmount = cart.reduce((sum, p) => sum + getFinalPrice(p), 0);
+
+      // SAVE EACH CART ITEM TO PANEL
+      cart.forEach((p, i) => {
+        const productName = [p.club, p.edicion].filter(Boolean).join(" · ");
+        saveOrderToPanel({
+          codigo: orderId + "-" + (i + 1),
+          cliente: nombre,
+          telefono: telefono,
+          producto: productName || p.nombre,
+          liga: p.liga || "",
+          talla: p.size || "",
+          precio: getFinalPrice(p),
+          metodo: "Web",
+          destino: pais || "Internacional",
+          personalizacion: [p.customName, p.customNumber].filter(Boolean).join(" "),
+          notas: [p.patches ? "Parches: " + p.patches : "", p.notes, p.isLongSleeve ? "Manga larga" : ""].filter(Boolean).join(" | "),
+          tracking: makeTracking(),
+          estado: "Hecho"
+        });
+      });
+
       const blocks = cart.map((p, i) => {
         return [
           `🧾 Item #${i + 1}`,
