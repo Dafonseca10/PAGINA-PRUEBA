@@ -361,7 +361,8 @@ if (cartSendBtn) cartSendBtn.addEventListener("click", startCartCheckout);
 if (cartSendBtn2) cartSendBtn2.addEventListener("click", startCartCheckout);
 
 function buildItemData(p) {
-  var productName = p.nombre || [p.club, p.edicion].filter(Boolean).join(" · ");
+  var parts = [p.club, p.nombre, p.edicion].filter(Boolean);
+  var productName = p.club ? (p.club + " · " + (p.nombre || p.edicion || "")) : (p.nombre || [p.edicion].filter(Boolean).join(""));
   return {
     producto: productName,
     liga: p.liga || "",
