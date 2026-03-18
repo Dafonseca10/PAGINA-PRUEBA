@@ -361,9 +361,9 @@ if (cartSendBtn) cartSendBtn.addEventListener("click", startCartCheckout);
 if (cartSendBtn2) cartSendBtn2.addEventListener("click", startCartCheckout);
 
 function buildItemData(p) {
-  var productName = [p.club, p.edicion].filter(Boolean).join(" · ");
+  var productName = p.nombre || [p.club, p.edicion].filter(Boolean).join(" · ");
   return {
-    producto: productName || p.nombre,
+    producto: productName,
     liga: p.liga || "",
     talla: p.size || "",
     precio: getFinalPrice(p),
